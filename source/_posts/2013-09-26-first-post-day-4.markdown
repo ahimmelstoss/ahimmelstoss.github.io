@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "my first post: day 4"
-date: 2013-09-26 18:15
+title: "first post: day 4"
+date: 2013-09-26 15:15
 comments: true
-categories:
+categories: 
 ---
 
 ``` ruby
