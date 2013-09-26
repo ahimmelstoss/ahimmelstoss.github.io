@@ -4,7 +4,7 @@
   <title><![CDATA[amanda's blog]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2013-09-26T13:20:04-04:00</updated>
+  <updated>2013-09-26T15:11:39-04:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
@@ -14,11 +14,22 @@
 
   
   <entry>
-    <title type="html"><![CDATA[hello world]]></title>
+    <title type="html"><![CDATA[my first post: day 4]]></title>
     <link href="http://ahimmelstoss.github.io/blog/2013/09/25/hello-world/"/>
     <updated>2013-09-25T18:15:00-04:00</updated>
     <id>http://ahimmelstoss.github.io/blog/2013/09/25/hello-world</id>
-    <content type="html"><![CDATA[
+    <content type="html"><![CDATA[<figure class='code'><figcaption><span>Discover if a number is prime</span><a href='http://www.noulakaz.net/weblog/2007/03/18/a-regular-expression-to-check-for-prime-numbers/'>Source Article</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'><span class="k">while</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">4</span>
+</span><span class='line'>  <span class="n">x</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;on our 4th day, we&#39;re learning loops.&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
 ]]></content>
   </entry>
   
