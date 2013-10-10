@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>amanda's blog</title>
+  <title>amanda himmelstoss</title>
   <meta name="author" content="amanda himmelstoss">
 
   
@@ -21,7 +21,7 @@
   <link rel="canonical" href="http://ahimmelstoss.github.io">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="amanda's blog" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="amanda himmelstoss" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
@@ -36,9 +36,9 @@
 
 <body   >
   <header role="banner"><hgroup>
-  <h1><a href="/">amanda's blog</a></h1>
+  <h1><a href="/">amanda himmelstoss</a></h1>
   
-    <h2>flatiron 003</h2>
+    <h2>learning to code.</h2>
   
 </hgroup>
 
@@ -162,6 +162,18 @@
 <aside class="sidebar">
   
     <section>
+  <h1>About Me</h1>
+  <p>I attend <a href="flatironschool.com">The Flatiron School</a>.</p>
+  <p><a href="flatironschool.com">My Website.</a></p>
+</section>
+
+<section>
+  <h1>On Twitter</h1>
+  <div>
+    <p><br/><a href="http://twitter.com/ahimmelstoss" class="twitter-follow-button" data-show-count="">@ahimmelstoss</a></p>
+  </div>
+</section>
+<section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
     
@@ -176,15 +188,34 @@
   </ul>
 </section>
 
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/ahimmelstoss">@ahimmelstoss</a> on GitHub
+  
   <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = '//platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'ahimmelstoss',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
   </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
 
 
   
