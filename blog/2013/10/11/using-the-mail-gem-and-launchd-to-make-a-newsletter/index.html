@@ -96,7 +96,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>After that, I entered the delivery options. As far as I could tell, you can only send from one gmail from another, not any other email server. Additionally, because gmail is particular, if I send an email to myself externally like this, it won&rsquo;t show up in the inbox, but the sent messages. To bypass this, I sent the email from my junk email address that I keep for purposes such as this. In the subject line, I used string interpolation to make the subject be the title of the article. In the <code>text_part</code>, I set the body to say something like &ldquo;this email is not supported in plain text&rdquo;. This message will never be seen in the email; it&rsquo;s for gmail to know that what I&rsquo;m sending (my scrape embedded in HTML) should be read as HTML. The real body of the email is in the <code>html_part</code>. I set the <code>content_type</code> to &lsquo;text/html; charset=UTF-8&rsquo;, and the body the interpolation of the article content, from my scrape.</p>
+<p>After that, I entered the delivery options. As far as I could tell, you can only send from one gmail from another, not any other email server. Additionally, because gmail is particular, if I send an email to myself externally like this, it won&rsquo;t show up in the inbox, but the sent messages. To bypass this, I sent the email from my junk email address that I keep for purposes such as this. In the subject line, I used string interpolation to make the subject be the title of the article. In the <code>text_part</code>, I set the body to say something like &ldquo;this email is not supported in plain text&rdquo;. This message will never be seen in gmail; it&rsquo;s for mail clients that don&rsquo;t support HTML. The real body of the email is in the <code>html_part</code>. I set the <code>content_type</code> to &lsquo;text/html; charset=UTF-8&rsquo;, and the body the interpolation of the article content, from my scrape.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -133,7 +133,9 @@
 
 <p>I then wanted to automate this even further by getting the email sent to me only once a week, at a certain time. Some research lead me to a feature within Mac OSX that automatically runs programs upon certain parameters. This is the same feature that automatically launches certain programs upon rebooting the machine. It&rsquo;s called launchd or launchctl.</p>
 
-<p>It requires making a <code>.plist</code> file in <code>~/Library/LaunchAgents</code>. When I went into this folder, I found a file already in there that launches Spotify upon rebooting (mystery solved on that). Before deleting that file, I copied the template to make my file.</p>
+<p>I figured this out, again, through some googling. <a href="http://stackoverflow.com/questions/132955/how-do-i-set-a-task-to-run-every-so-often">This helpful comment</a> on Stack Overflow gives a good explanation on how to use <a href="https://developer.apple.com/library/mac/documentation/macosx/conceptual/bpsystemstartup/chapters/CreatingLaunchdJobs.html#//apple_ref/doc/uid/TP40001762-104142">Launchd</a> to run jobs.</p>
+
+<p>It requires making a <code>.plist</code> file in <code>~/Library/LaunchAgents</code>. When I went into this folder, I found a file already in there that launches Spotify upon rebooting (mystery solved on that). Before deleting that file, I copied the template to make my file, <code>com.myname.myprogram.plist</code>.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -162,7 +164,7 @@
 </span><span class='line'><span class="o">&lt;</span><span class="n">plist</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.0&quot;</span><span class="o">&gt;</span>
 </span><span class='line'><span class="o">&lt;</span><span class="n">dict</span><span class="o">&gt;</span>
 </span><span class='line'> <span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="no">Label</span><span class="o">&lt;</span><span class="sr">/key&gt;</span>
-</span><span class='line'><span class="sr"> &lt;string&gt;.plist file name&lt;/s</span><span class="n">tring</span><span class="o">&gt;</span>
+</span><span class='line'><span class="sr"> &lt;string&gt;com.myname.myprogram&lt;/s</span><span class="n">tring</span><span class="o">&gt;</span>
 </span><span class='line'> <span class="o">&lt;</span><span class="n">key</span><span class="o">&gt;</span><span class="no">StartCalendarInterval</span><span class="o">&lt;</span><span class="sr">/key&gt;</span>
 </span><span class='line'><span class="sr"> &lt;dict&gt;</span>
 </span><span class='line'><span class="sr">  &lt;key&gt;Hour&lt;/</span><span class="n">key</span><span class="o">&gt;</span>
@@ -185,7 +187,7 @@
 <p>The important part of this was setting <code>StartCalendarInterval</code> to the day, hour, and minute. This tells the computer to run the program (in the <code>ProgramArguments</code>) when indicated. Within the <code>ProgramArguments</code> I indicated the location of ruby, and the location of my program.</p>
 
 <p>To test to make sure the <code>.plist</code> file works, not just at the time I indicated, I ran this:
-<code>launchctl start program_name</code></p>
+<code>launchctl start com.myname.myprogram</code></p>
 
 <p>Waiting in my inbox moments later was my newsletter. :)</p>
 </div>
