@@ -4,7 +4,7 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2013-10-11T16:10:09-04:00</updated>
+  <updated>2013-10-11T17:45:11-04:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
@@ -30,7 +30,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Next, within my program, I set the mail options, which I figured out from the <a href="https://github.com/mikel/mail">gem documentation</a>:</p>
+<p>Next, within my program, I set the mail options, which I figured out from the <a href="https://github.com/mikel/mail">gem documentation</a> and some googling about gmail configurations:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
