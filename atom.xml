@@ -4,13 +4,228 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2013-10-17T13:49:11-04:00</updated>
+  <updated>2013-10-17T22:23:39-04:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
     
   </author>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Roman Numerals Converter Explained]]></title>
+    <link href="http://ahimmelstoss.github.io/blog/2013/10/17/roman-numerals-converter-explained/"/>
+    <updated>2013-10-17T21:40:00-04:00</updated>
+    <id>http://ahimmelstoss.github.io/blog/2013/10/17/roman-numerals-converter-explained</id>
+    <content type="html"><![CDATA[<p>I&rsquo;m going to spend this post explaining a roman numeral converter I made for one of our morning todo assignments. I struggled with this assignment, so I thought the best way to really drive it home would be to explain it.</p>
+
+<p>First, within the <code>Integer</code> class, I defined as a constant variable a hash of that is representative of all of the roman numeral characters within their counting system. I cheated a little bit and included instances of 4 and 9, because those are a bit complicated.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="no">NUMERALS</span> <span class="o">=</span>
+</span><span class='line'>   <span class="p">{</span>
+</span><span class='line'>    <span class="mi">1</span> <span class="o">=&gt;</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">4</span> <span class="o">=&gt;</span> <span class="s2">&quot;IV&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">5</span> <span class="o">=&gt;</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">9</span> <span class="o">=&gt;</span> <span class="s2">&quot;IX&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">10</span> <span class="o">=&gt;</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">40</span> <span class="o">=&gt;</span> <span class="s2">&quot;XL&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">50</span> <span class="o">=&gt;</span> <span class="s2">&quot;L&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">90</span> <span class="o">=&gt;</span> <span class="s2">&quot;XC&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">100</span> <span class="o">=&gt;</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">400</span> <span class="o">=&gt;</span> <span class="s2">&quot;CD&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">500</span> <span class="o">=&gt;</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">900</span> <span class="o">=&gt;</span> <span class="s2">&quot;CM&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">1000</span> <span class="o">=&gt;</span> <span class="s2">&quot;M&quot;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The instance of the <code>Integer</code> class method is a number, which I called in the initialize method.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</span><span class='line'>  <span class="vi">@number</span> <span class="o">=</span> <span class="n">number</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once I got that out of the way, I began to think about the logic of the roman numerals. Generally, it&rsquo;s addition and substraction. The number 40, for example is representated as XL. L is 50 and X is 10. 50(L) &ndash; 10(X) is 40. Or, the number 13 is XIIII. 10(X) + 1(I) +1(I) +1(I) is 11. The relationship is one of addition and subtraction when you are trying to represent a number that is not a singular character within the roman numeral library.</p>
+
+<p>How to execute this relationship through code is the complicated part. I am at that point in my learning where I know what I want to accomplish with code, but the execution doesn&rsquo;t come completely naturally. If I compare it to language learning, I am in the recognition stage and still somewhat fumbling with the recollection.</p>
+
+<p>I executed this converter with two methods. The first method, <code>lower_key</code>, takes an instance number as an argument, and returns the largest number below it which has an associated roman numeral. <code>to_roman</code> uses the return of <code>lower_key</code> to help generate the roman numeral associated with the instance of <code>number</code>. I&rsquo;ll discuss <code>lower_key</code> first.</p>
+
+<p>First, I create a new array, <code>numbers_array</code>, and I <code>.collect</code> all of the numbers in my <code>NUMERALS</code> hash and sort them:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">numbers_array</span> <span class="o">=</span> <span class="no">NUMERALS</span><span class="o">.</span><span class="n">collect</span> <span class="p">{</span><span class="o">|</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="o">|</span> <span class="n">k</span><span class="p">}</span><span class="o">.</span><span class="n">sort</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This gives me an easy array of the numbers to work with when I compare them to <code>number</code>.</p>
+
+<p>Before I mentioned that the logic of roman numerals is that we&rsquo;re adding roman numeral characters together to make a number. In order to do that, we need to know the number right below it to work on that. To do this, I iterated over my new <code>numbers_array</code> with <code>.each_with_index</code>. In <code>numbers_array</code> the number (I called it <code>decimal</code>) below <code>number</code> can be found through first determining the number above it. Then, using its <code>index</code>, I can access the number below. Then, returning the <code>.last</code> in <code>numbers_array</code> accounts for if <code>number</code> is greater than the largest number in <code>NUMERALS</code>, like 3000.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">numbers_array</span><span class="o">.</span><span class="n">each_with_index</span> <span class="k">do</span> <span class="o">|</span><span class="n">decimal</span><span class="p">,</span> <span class="n">index</span><span class="o">|</span>
+</span><span class='line'>  <span class="k">if</span> <span class="n">decimal</span> <span class="o">&gt;</span> <span class="n">number</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">numbers_array</span><span class="o">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="k">return</span> <span class="n">numbers_array</span><span class="o">.</span><span class="n">last</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Onto the <code>to_roman</code> method. First, I confirmed that <code>number</code> is <code>self</code>. I then set a variable <code>roman_numeral = ""</code>; I will be pushing into this string below.</p>
+
+<p>The bulk of the method in enclosed in a <code>while</code> loop. If <code>NUMERALS</code> includes <code>number</code>, set that <code>NUMERALS[number]</code> as <code>roman_numeral</code>. This takes care of instances of <code>number</code> that are simple and already defined in <code>NUMERALS</code>, like 5(V). For more complicated instances, we loop beyond this.</p>
+
+<p>Let&rsquo;s take a more complicated number like 51(LI) as an example to follow through. It doesn&rsquo;t apply yet to the <code>if</code> block, but instead is passed into the <code>else</code> first. <code>lower_key(51)</code> is called, which returns 50. &ldquo;L&rdquo; is added into <code>roman_numeral</code> (<code>roman_numeral += NUMERALS[50]</code>). Then the remainder of that (<code>number -= 50</code>) is 1, which is passed up and looped through. <code>NUMERALS</code> has that as a key, where the value is &ldquo;I&rdquo;, and that is pushed into <code>roman_numeral</code>, right behind the &ldquo;L&rdquo; already in there from before. &ldquo;LI&rdquo; is returned.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">while</span> <span class="n">number</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</span><span class='line'>  <span class="k">if</span> <span class="no">NUMERALS</span><span class="o">.</span><span class="n">has_key?</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">roman_numeral</span> <span class="o">&lt;&lt;</span> <span class="no">NUMERALS</span><span class="o">[</span><span class="n">number</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">roman_numeral</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>    <span class="n">roman_numeral</span> <span class="o">+=</span> <span class="no">NUMERALS</span><span class="o">[</span><span class="n">lower_key</span><span class="p">(</span><span class="n">number</span><span class="p">)</span><span class="o">]</span>
+</span><span class='line'>    <span class="n">number</span> <span class="o">-=</span> <span class="n">lower_key</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Below is the entire program.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Integer</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="no">NUMERALS</span> <span class="o">=</span>
+</span><span class='line'>   <span class="p">{</span>
+</span><span class='line'>    <span class="mi">1</span> <span class="o">=&gt;</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">4</span> <span class="o">=&gt;</span> <span class="s2">&quot;IV&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">5</span> <span class="o">=&gt;</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">9</span> <span class="o">=&gt;</span> <span class="s2">&quot;IX&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">10</span> <span class="o">=&gt;</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">40</span> <span class="o">=&gt;</span> <span class="s2">&quot;XL&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">50</span> <span class="o">=&gt;</span> <span class="s2">&quot;L&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">90</span> <span class="o">=&gt;</span> <span class="s2">&quot;XC&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">100</span> <span class="o">=&gt;</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">400</span> <span class="o">=&gt;</span> <span class="s2">&quot;CD&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">500</span> <span class="o">=&gt;</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">900</span> <span class="o">=&gt;</span> <span class="s2">&quot;CM&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="mi">1000</span> <span class="o">=&gt;</span> <span class="s2">&quot;M&quot;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@number</span> <span class="o">=</span> <span class="n">number</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">lower_key</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">numbers_array</span> <span class="o">=</span> <span class="no">NUMERALS</span><span class="o">.</span><span class="n">collect</span> <span class="p">{</span><span class="o">|</span><span class="n">decimal</span><span class="p">,</span> <span class="n">roman</span><span class="o">|</span> <span class="n">decimal</span><span class="p">}</span><span class="o">.</span><span class="n">sort</span>
+</span><span class='line'>    <span class="n">numbers_array</span><span class="o">.</span><span class="n">each_with_index</span> <span class="k">do</span> <span class="o">|</span><span class="n">decimal</span><span class="p">,</span> <span class="n">index</span><span class="o">|</span>
+</span><span class='line'>      <span class="k">if</span> <span class="n">decimal</span> <span class="o">&gt;</span> <span class="n">number</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">numbers_array</span><span class="o">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="o">]</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">numbers_array</span><span class="o">.</span><span class="n">last</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">to_roman</span>
+</span><span class='line'>    <span class="n">number</span> <span class="o">=</span> <span class="nb">self</span>
+</span><span class='line'>    <span class="n">roman_numeral</span><span class="o">=</span> <span class="s2">&quot;&quot;</span>
+</span><span class='line'>    <span class="k">while</span> <span class="n">number</span> <span class="o">&gt;</span> <span class="mi">0</span>
+</span><span class='line'>      <span class="k">if</span> <span class="no">NUMERALS</span><span class="o">.</span><span class="n">has_key?</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">roman_numeral</span> <span class="o">&lt;&lt;</span> <span class="no">NUMERALS</span><span class="o">[</span><span class="n">number</span><span class="o">]</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">roman_numeral</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>        <span class="n">roman_numeral</span> <span class="o">+=</span> <span class="no">NUMERALS</span><span class="o">[</span><span class="n">lower_key</span><span class="p">(</span><span class="n">number</span><span class="p">)</span><span class="o">]</span>
+</span><span class='line'>        <span class="n">number</span> <span class="o">-=</span> <span class="n">lower_key</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[One Line at a Time with Ruby Koans]]></title>
