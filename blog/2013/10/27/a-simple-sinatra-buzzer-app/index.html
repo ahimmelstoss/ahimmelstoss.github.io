@@ -63,7 +63,21 @@
 
 <time datetime="2013-10-27T23:03:00-04:00" pubdate data-updated="true">Oct 27<span>th</span>, 2013</time></div>
 	</header>
-	<div class="entry-content"><p>This weekend, I wrote a simple door buzzer app that requires authentication before execution. The point of this is to be able to buzz open our downstairs doors from anywhere (particularly useful when hosting airbnb guests). My boyfriend did all of the methanical work: we got a raspberry pi (which we turned into a server to host the app) and a relay to connect that to the door buzzer (there was sautering and wires involved; I just watched). Through that, it&rsquo;s possible to trigger the buzzer from the command line of the raspberry pi. We (well, mostly my boyfriend; I, again, just really watched) wrote a simple C command to trigger the buzzer for 5 seconds, long enough for someone to get through both doors downstairs.</p>
+	<div class="entry-content"><p>This weekend, I wrote a simple door buzzer app that requires authentication before execution. The point of this is to be able to buzz open our downstairs doors from anywhere (particularly useful when hosting airbnb guests). My boyfriend did all of the methanical work: we got a raspberry pi (which we turned into a server to host the app) and a relay to connect that to the door buzzer (there was sautering and wires involved; I just watched). Through that, it&rsquo;s possible to trigger the buzzer from the command line of the raspberry pi. We (well, mostly my boyfriend; I, again, just really watched) wrote a simple C command to trigger the buzzer for 5 seconds, long enough for someone to get through both doors downstairs:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /sys/class/gpio
+</span><span class='line'>echo 2 &gt; export
+</span><span class='line'>echo out &gt; gpio2/direction
+</span><span class='line'>echo 0 &gt; gpio2/value
+</span><span class='line'>sleep 5
+</span><span class='line'>echo 1 &gt; gpio2/value</span></code></pre></td></tr></table></div></figure>
+
 
 <p><img src="/images/buzzer.jpg" width="400" height="400" title="buzzer" ></p>
 
