@@ -4,7 +4,7 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2013-10-27T23:52:48-04:00</updated>
+  <updated>2013-10-27T23:53:32-04:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
@@ -135,8 +135,6 @@
 <p><img src="http://ahimmelstoss.github.io/images/failure.png" width="600" height="600" title="failure" ></p>
 
 <p>Soon I hope to expand on this project to be able to receive output from the buzzer (to be notified when someone buzzes and then be able to respond with triggering the buzzer). Additionally, I am working on an email notification feature that will notify the administrator each time the buzzer is triggered. My takeaway from this, besides a super useful application, is that sometimes the best tools for a project are the most simple ones. Also, that Sinatra is awesome. :)</p>
-
-<p>test</p>
 ]]></content>
   </entry>
   
