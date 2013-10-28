@@ -4,7 +4,7 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2013-10-27T23:53:32-04:00</updated>
+  <updated>2013-10-28T00:04:08-04:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
@@ -18,6 +18,8 @@
     <updated>2013-10-27T23:03:00-04:00</updated>
     <id>http://ahimmelstoss.github.io/blog/2013/10/27/a-simple-sinatra-buzzer-app</id>
     <content type="html"><![CDATA[<p>This weekend, I wrote a simple door buzzer app that requires authentication before execution. The point of this is to be able to buzz open our downstairs doors from anywhere (particularly useful when hosting airbnb guests). My boyfriend did all of the methanical work: we got a raspberry pi (which we turned into a server to host the app) and a relay to connect that to the door buzzer (there was sautering and wires involved; I just watched). Through that, it&rsquo;s possible to trigger the buzzer from the command line of the raspberry pi. We (well, mostly my boyfriend; I, again, just really watched) wrote a simple C command to trigger the buzzer for 5 seconds, long enough for someone to get through both doors downstairs.</p>
+
+<p><img src="http://ahimmelstoss.github.io/images/buzzer.jpg" width="400" height="400" title="buzzer" ></p>
 
 <p>I approached this project not necessarily as a big challenge, but as a way to drill in the skills we&rsquo;ve been working on this week into a cool, useful project. This is the second personal project I&rsquo;ve worked on during school, but one that was most rewarding. To see all the components come together to make something that is truly useful was super awesome for me. I had been vaguely envisioning writing a door buzzer app for quite sometime, but I didn&rsquo;t have the skills yet to accomplish that. It was an empowering to realize I was at a point in my learning where I could build something that 4 weeks ago, I wouldn&rsquo;t have known how to even begin building.</p>
 
