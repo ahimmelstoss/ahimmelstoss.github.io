@@ -7,7 +7,7 @@
 
 	<meta name="author" content="amanda himmelstoss">
 
-<meta name="description" content="I feel that one of the main challenges I had with of doing liberal arts in college is feeling that given the breadth of my learning, I always felt &hellip;"> <meta name="keywords" content="">
+<meta name="description" content="LAF (&ldquo;Life after Flatiron&rdquo;) has been a mixture of emotions, but has primarily meant that I&rsquo;m exploring new technologies, languages &hellip;"> <meta name="keywords" content="">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -47,6 +47,197 @@
 </header>
 
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2013/12/20/adventures-in-php/">
+			
+				Adventures in PHP</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-20T17:52:00-05:00" pubdate data-updated="true">Dec 20<span>th</span>, 2013</time></div>
+	</header>
+	<div class="entry-content">
+		<p>LAF (&ldquo;Life after Flatiron&rdquo;) has been a mixture of emotions, but has primarily meant that I&rsquo;m exploring new technologies, languages and stacks. I&rsquo;m currently learning PHP, among other things, for my LAF job. I&rsquo;m finding that PHP isn&rsquo;t very different from Ruby; they&rsquo;re both scripting languages, so logically very similar. Problems I&rsquo;m familiar with in Ruby can be easily solved in PHP, just with a different syntax.</p>
+
+<p>I happily breezed through Codecademy&rsquo;s <a href="http://www.codecademy.com/tracks/php">PHP Track</a>, at a pace that made me feel quite pleased with myself. :) Three months ago, the Ruby Track took more than twice as long to go through.</p>
+
+<p>Once I became familiar with the basic syntax of PHP, I decided to expand my learning by writing some simple programs that I had previously done in Ruby.</p>
+
+<p>First, naturally, was FizzBuzz, written procedurally. For my own clarity and practice, I pushed the fizzes, buzzes, and fizzbuzzes into an array:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>  <span class="k">function</span> <span class="nf">fizzbuzz</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$myFizzBuzzes</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">foreach</span> <span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span> <span class="k">as</span> <span class="nv">$num</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nv">$num</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nv">$num</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>        <span class="nb">array_push</span><span class="p">(</span><span class="nv">$myFizzBuzzes</span><span class="p">,</span> <span class="s2">&quot;FIZZBUZZ&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$num</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nb">array_push</span><span class="p">(</span><span class="nv">$myFizzBuzzes</span><span class="p">,</span> <span class="s2">&quot;fizz&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$num</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nb">array_push</span><span class="p">(</span><span class="nv">$myFizzBuzzes</span><span class="p">,</span> <span class="s2">&quot;buzz&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$myFizzBuzzes</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next, practicing switch statements (like case statements in Ruby), I wrote a vowel checker program. I included some syntactic sugar with the <code>endswitch;</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>  <span class="k">function</span> <span class="nf">isVowel</span><span class="p">(</span><span class="nv">$letter</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">switch</span><span class="p">(</span><span class="nx">strtolower</span><span class="p">(</span><span class="nv">$letter</span><span class="p">))</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s2">&quot;a&quot;</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s2">&quot;e&quot;</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s2">&quot;i&quot;</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s2">&quot;o&quot;</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s2">&quot;u&quot;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nv">$letter</span><span class="si">}</span><span class="s2">&#39; is a vowel.&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nv">$letter</span><span class="si">}</span><span class="s2">&#39; is not a vowel.&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">endswitch</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">echo</span> <span class="nx">isVowel</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As a fan of object orientation (being an organizational freak, I guess it makes sense that I would love classes), I created a Triangle class which will return the type of triangle, given the sides. Additionally, I tried my hand at some Exception throwing, which throws an error if the sides do not make a valid triangle. Exceptions, like in Ruby, are classes that your custom class can inherit from.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">TriangleError</span> <span class="k">extends</span> <span class="nx">Exception</span> <span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Triangle</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">public</span> <span class="nv">$side1</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">public</span> <span class="nv">$side2</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">public</span> <span class="nv">$side3</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$side1</span><span class="p">,</span> <span class="nv">$side2</span><span class="p">,</span> <span class="nv">$side3</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">=</span> <span class="nv">$side1</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">=</span> <span class="nv">$side2</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span> <span class="o">=</span> <span class="nv">$side3</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">validate</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">validate</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">throw</span> <span class="k">new</span> <span class="nx">TriangleError</span><span class="p">(</span><span class="s2">&quot;error; not valid triangle&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">+</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">&lt;=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span> <span class="o">||</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">+</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span> <span class="o">&lt;=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">+</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span> <span class="o">&lt;=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">throw</span> <span class="k">new</span> <span class="nx">TriangleError</span><span class="p">(</span><span class="s2">&quot;error; not valid triangle&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">kind</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">&amp;&amp;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s2">&quot;equilateral&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s2">&quot;isosceles&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s2">&quot;scalene&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nv">$myTriangle</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Triangle</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="nv">$myTriangle</span><span class="o">-&gt;</span><span class="na">kind</span><span class="p">();</span>
+</span><span class='line'> <span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post">
