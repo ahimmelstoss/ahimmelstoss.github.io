@@ -1,0 +1,190 @@
+
+<!DOCTYPE HTML>
+<html lang="en-GB">
+<head>
+	<meta charset="utf-8">
+	<title>Forms in PHP  | amanda himmelstoss</title>
+
+	<meta name="author" content="amanda himmelstoss">
+
+<meta name="description" content="Today I continued in my exercise in familiarizing myself with PHP&rsquo;s syntax. I rewrote an old program I did two months ago in Ruby, a Roman &hellip;"> <meta name="keywords" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="amanda himmelstoss" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">amanda himmelstoss</a></h1>
+<span class="tagline">learning to code.</span>
+<nav id="main-nav"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</div>
+	</div>
+</nav>
+
+
+</header>
+
+	<div id="content" class="inner"><article class="post">
+	<header>
+		<h2 class="title">Forms in PHP</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-26T20:37:00-05:00" pubdate data-updated="true">Dec 26<span>th</span>, 2013</time></div>
+	</header>
+	<div class="entry-content"><p>Today I continued in my exercise in familiarizing myself with PHP&rsquo;s syntax. I rewrote an old program I did two months ago in Ruby, a <a href="http://ahimmelstoss.github.io/blog/2013/10/17/roman-numerals-converter-explained/">Roman Numerals Converter</a>, drilling in classes, array iterations, and few new methods and tricks (like the <code>end();</code> method that gives you the last element in an array).</p>
+
+<p>I decided to turn this converter into something interactive, using good ol&#8217; HTML forms. One of the cool things about PHP is that you can get a dynamic website up and going pretty quick, without a framework in place, so making a converter where a user can enter a number and get back the Roman numeral for that was relatively quick and clean. In fact, rendering HTML forms with PHP is not unlike ERB (embedded Ruby).</p>
+
+<p>In a .php file, you set up your HTML as you like, and if your logic isn&rsquo;t in the file (I think best practices is to keep logic and rendering separate), you be sure to <code>include();</code> the file you wish to use. Be sure to <code>include();</code> above where you want to work with it on the page.</p>
+
+<p>I&rsquo;ll admit that my time in Rails led me to momentarily forget how to write a traditional form. Mine is relatively simple:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>  <span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;romanconverter.php&quot;</span> <span class="na">method=</span><span class="s">&quot;get&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    Number: <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;number&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;convert!&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/form&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next comes the rendering of that get request. PHP makes this relatively easy:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'>  <span class="o">&lt;?</span><span class="nx">php</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">]))</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="x">  </span><span class="cp">&lt;?php</span> <span class="k">elseif</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nb">is_numeric</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"> </span>
+</span><span class='line'><span class="x">    &lt;p&gt;Your Number: </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">]</span> <span class="cp">?&gt;</span><span class="x">&lt;/p&gt;</span>
+</span><span class='line'><span class="x">    </span><span class="cp">&lt;?php</span>
+</span><span class='line'>    <span class="nv">$myRoman</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Roman</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">]);</span>
+</span><span class='line'>    <span class="nv">$mynumber</span> <span class="o">=</span> <span class="nv">$myRoman</span><span class="o">-&gt;</span><span class="na">toRoman</span><span class="p">();</span>
+</span><span class='line'>    <span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="x">    &lt;p&gt;Roman Number: </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$mynumber</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"> &lt;/p&gt;</span>
+</span><span class='line'><span class="x">  </span><span class="cp">&lt;?php</span> <span class="k">else</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="x">    &lt;p&gt;Error! Please enter a valid number.&lt;/p&gt;</span>
+</span><span class='line'><span class="x">  </span><span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I included some validation on the <code>$_GET</code> to make sure that something is in the input (<code>isset();</code>), the input is a number (<code>is_numeric();</code>), and that it is greater than 0, as the Roman numerals system does not have a zero. Encapsulated is the calling of a new instance of the <code>Roman</code> class, and the calling of a function within that class converts the number (in PHP, the syntax for calling a class function is different than caling a regular one: <code>$myRoman-&gt;toRoman();</code>). The <code>&lt;?php  ?&gt;</code> brackets around the if, elseif, else, and endif are just one way of embedding PHP into a page (you can instead <code>echo</code> your HTML tags and text within one big PHP block); I think this looks cleaner.</p>
+
+<p>One cool thing about PHP is the <code>$_GET</code> variable; this is called a <code>superglobal</code> array. There is also <code>$_POST</code>, <code>$_REQUEST</code>, <code>$_SERVER</code>, <code>$_ENV</code>, <code>$_SESSION</code>, and <code>$_COOKIE</code>. These superglobal arrays are very similar to <code>params[]</code> found in Ruby on Rails and Sinatra. These arrays are where PHP stores values sent into a script from an HTML from the GET, POST, etc methods. Whereas <code>params[]</code> can hold data from any type of action, the differentiation between get, post, etc gives some added security.</p>
+
+<p>If you want to play with my Roman Numerals Converter, it&rsquo;s <a href="http://www.amandahimmelstoss.com/romanconverter.php">here</a>!</p>
+</div>
+	
+		<div class="meta">
+			<span class="comments"><a href="/blog/2013/12/26/forms-in-php/#disqus_thread">Comments</a></span>
+		</div>
+	
+
+</article>
+
+	
+	<div class="share">
+		<ul>
+			<li>
+  <a href="https://twitter.com/intent/tweet?text=Forms in PHP by @ahimmelstoss&url=http://ahimmelstoss.github.io/blog/2013/12/26/forms-in-php/" title="Share Forms in PHP on Twitter">
+    <img src="/images/social/twitter.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://www.facebook.com/sharer.php?u=http://ahimmelstoss.github.io/blog/2013/12/26/forms-in-php/" title="Share Forms in PHP on Facebook">
+    <img src="/images/social/facebook.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://plus.google.com/share?url=http://ahimmelstoss.github.io/blog/2013/12/26/forms-in-php/" title="Share Forms in PHP on Google Plus">
+    <img src="/images/social/google.png" />
+  </a>
+</li>
+
+		</ul>
+	</div>
+
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">&copy; 2013
+
+    amanda himmelstoss
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/hyphenator.js"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'learningtocode';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ahimmelstoss.github.io/blog/2013/12/26/forms-in-php/';
+        var disqus_url = 'http://ahimmelstoss.github.io/blog/2013/12/26/forms-in-php/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+</body>
+</html>
