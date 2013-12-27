@@ -1,0 +1,215 @@
+
+<!DOCTYPE HTML>
+<html lang="en-GB">
+<head>
+	<meta charset="utf-8">
+	<title>Arrays in PHP  | amanda himmelstoss</title>
+
+	<meta name="author" content="amanda himmelstoss">
+
+<meta name="description" content="In continuing to learn about arrays and data structures in PHP, I&rsquo;ve been playing around with a few cool functions. array_column(); is a handy &hellip;"> <meta name="keywords" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="amanda himmelstoss" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">amanda himmelstoss</a></h1>
+<span class="tagline">learning to code.</span>
+<nav id="main-nav"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</div>
+	</div>
+</nav>
+
+
+</header>
+
+	<div id="content" class="inner"><article class="post">
+	<header>
+		<h2 class="title">Arrays in PHP</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-27T12:38:00-05:00" pubdate data-updated="true">Dec 27<span>th</span>, 2013</time></div>
+	</header>
+	<div class="entry-content"><p>In continuing to learn about arrays and data structures in PHP, I&rsquo;ve been playing around with a few cool functions.</p>
+
+<p><code>array_column();</code> is a handy method in PHP5.5 that returns all of the values of a single column, given the key.</p>
+
+<p>Let&rsquo;s say I had the following associated array:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$catCelebs</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>    <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Maru&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;breed&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Scottish Fold&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">6</span>
+</span><span class='line'>    <span class="p">),</span>
+</span><span class='line'>    <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Nala Cat&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;breed&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Siamese mix&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">3</span>
+</span><span class='line'>    <span class="p">),</span>
+</span><span class='line'>    <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Lil Bub&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;breed&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Domestic Shorthair&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span>
+</span><span class='line'>    <span class="p">),</span>
+</span><span class='line'>    <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Tardar Sauce&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;breed&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Siamese&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="p">)</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If I wanted all of the cat&rsquo;s names, I would write:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$catNames</span> <span class="o">=</span> <span class="nx">array_column</span><span class="p">(</span><span class="nv">$catCelebs</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>array_key_exists();</code> is a function that checks if an array contains a given key, returning true or false.</p>
+
+<p>From <code>$catCelebs</code> above, if I wanted to check if age was an included column, I would write:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">array_key_exists</span><span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="nv">$catCelebs</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="s2">&quot;We know the ages of the celebrity cats!&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Similar to this are two other useful functions that allow you to search arrays: <code>in_array();</code> searches an array for a value and returns true or false if it exists, and <code>array_search();</code> looks for a value and returns its key if it exists, and false otherwise.</p>
+
+<p><code>array_unique();</code>, much like the name suggests, will remove duplicates from a given array, the return of that being a new array. This function does not change the original array, so reassignment would be necessary.</p>
+</div>
+	
+		<div class="meta">
+			<span class="comments"><a href="/blog/2013/12/27/arrays-in-php/#disqus_thread">Comments</a></span>
+		</div>
+	
+
+</article>
+
+	
+	<div class="share">
+		<ul>
+			<li>
+  <a href="https://twitter.com/intent/tweet?text=Arrays in PHP by @ahimmelstoss&url=http://ahimmelstoss.github.io/blog/2013/12/27/arrays-in-php/" title="Share Arrays in PHP on Twitter">
+    <img src="/images/social/twitter.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://www.facebook.com/sharer.php?u=http://ahimmelstoss.github.io/blog/2013/12/27/arrays-in-php/" title="Share Arrays in PHP on Facebook">
+    <img src="/images/social/facebook.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://plus.google.com/share?url=http://ahimmelstoss.github.io/blog/2013/12/27/arrays-in-php/" title="Share Arrays in PHP on Google Plus">
+    <img src="/images/social/google.png" />
+  </a>
+</li>
+
+		</ul>
+	</div>
+
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">&copy; 2013
+
+    amanda himmelstoss
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/hyphenator.js"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'learningtocode';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ahimmelstoss.github.io/blog/2013/12/27/arrays-in-php/';
+        var disqus_url = 'http://ahimmelstoss.github.io/blog/2013/12/27/arrays-in-php/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+</body>
+</html>
