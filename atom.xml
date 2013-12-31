@@ -4,13 +4,50 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2013-12-27T15:41:29-05:00</updated>
+  <updated>2013-12-31T18:31:24-05:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
     
   </author>
 
+  
+  <entry>
+    <title type="html"><![CDATA[The SplFixedArray Class]]></title>
+    <link href="http://ahimmelstoss.github.io/blog/2013/12/31/the-splfixedarray-class/"/>
+    <updated>2013-12-31T18:56:00-05:00</updated>
+    <id>http://ahimmelstoss.github.io/blog/2013/12/31/the-splfixedarray-class</id>
+    <content type="html"><![CDATA[<p>Another type of data structure that is unique to PHP is the SplFixedArray. This is a class that embodies much of the same functionality as an indexed array, but performs slightly different.</p>
+
+<p>Arrays in PHP, while functionally similar to arrays in other languages, like Ruby, more closely resemble hashes, as both indexed and associative arrays both use key => value pairs, where the key can be either an integer or a string. However, SplFixedArrays are not unlike arrays found within Ruby. Their indexes are fixed integers, and their performance is better on a large scale than an associative array.</p>
+
+<p>An SplFixedArray has a fixed size (other arrays in PHP can be any size) that is determined in the  instantiation. Below, I&rsquo;ve instantiated a new SplFixedArray (remember, it&rsquo;s a class!) and set four of the values.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$cats</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SplFixedArray</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Maru&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Grumpy Cat&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Nala Cat&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Chairman Meow&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To increase the size of <code>$cats</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$cats</span><span class="o">-&gt;</span><span class="na">setSize</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The value of <code>$cats[4];</code> will be NULL until it&rsquo;s set. (Note that <code>setSize();</code> is a class function.)</p>
+
+<p>The SplFixedArray is a great data structure that is more optimal in some cases, and for the Rubyists who love Ruby arrays, very familiar. :)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Arrays in PHP, Continued]]></title>
