@@ -1,0 +1,168 @@
+
+<!DOCTYPE HTML>
+<html lang="en-GB">
+<head>
+	<meta charset="utf-8">
+	<title>The SplFixedArray Class  | amanda himmelstoss</title>
+
+	<meta name="author" content="amanda himmelstoss">
+
+<meta name="description" content="Another type of data structure that is unique to PHP is the SplFixedArray. This is a class that embodies much of the same functionality as an indexed &hellip;"> <meta name="keywords" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="amanda himmelstoss" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">amanda himmelstoss</a></h1>
+<span class="tagline">building things</span>
+<nav id="main-nav"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</div>
+	</div>
+</nav>
+
+
+</header>
+
+	<div id="content" class="inner"><article class="post">
+	<header>
+		<h2 class="title">The SplFixedArray Class</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-31T18:56:00-05:00" pubdate data-updated="true">Dec 31<span>st</span>, 2013</time></div>
+	</header>
+	<div class="entry-content"><p>Another type of data structure that is unique to PHP is the SplFixedArray. This is a class that embodies much of the same functionality as an indexed array, but performs slightly different.</p>
+
+<p>Arrays in PHP, while functionally similar to arrays in other languages, like Ruby, more closely resemble hashes, as both indexed and associative arrays both use key => value pairs, where the key can be either an integer or a string. However, SplFixedArrays are not unlike arrays found within Ruby. Their indexes are fixed integers, and their performance is better on a large scale than an associative array.</p>
+
+<p>An SplFixedArray has a fixed size (other arrays in PHP can be any size) that is determined in the  instantiation. Below, I&rsquo;ve instantiated a new SplFixedArray (remember, it&rsquo;s a class!) and set four of the values.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$cats</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SplFixedArray</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Maru&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Grumpy Cat&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Nala Cat&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Chairman Meow&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To increase the size of <code>$cats</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$cats</span><span class="o">-&gt;</span><span class="na">setSize</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The value of <code>$cats[4];</code> will be NULL until it&rsquo;s set. (Note that <code>setSize();</code> is a class function.)</p>
+
+<p>The SplFixedArray is a great data structure that is more optimal in some cases, and for the Rubyists who love Ruby arrays, very familiar. :)</p>
+</div>
+	
+		<div class="meta">
+			<span class="comments"><a href="/blog/2013/12/31/the-splfixedarray-class/#disqus_thread">Comments</a></span>
+		</div>
+	
+
+</article>
+
+	
+	<div class="share">
+		<ul>
+			<li>
+  <a href="https://twitter.com/intent/tweet?text=The SplFixedArray Class by @ahimmelstoss&url=http://ahimmelstoss.github.io/blog/2013/12/31/the-splfixedarray-class/" title="Share The SplFixedArray Class on Twitter">
+    <img src="/images/social/twitter.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://www.facebook.com/sharer.php?u=http://ahimmelstoss.github.io/blog/2013/12/31/the-splfixedarray-class/" title="Share The SplFixedArray Class on Facebook">
+    <img src="/images/social/facebook.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://plus.google.com/share?url=http://ahimmelstoss.github.io/blog/2013/12/31/the-splfixedarray-class/" title="Share The SplFixedArray Class on Google Plus">
+    <img src="/images/social/google.png" />
+  </a>
+</li>
+
+		</ul>
+	</div>
+
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">&copy; 2014
+
+    amanda himmelstoss
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/hyphenator.js"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'buildingthings';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ahimmelstoss.github.io/blog/2013/12/31/the-splfixedarray-class/';
+        var disqus_url = 'http://ahimmelstoss.github.io/blog/2013/12/31/the-splfixedarray-class/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+</body>
+</html>

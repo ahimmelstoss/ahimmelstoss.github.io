@@ -1,0 +1,1354 @@
+
+<!DOCTYPE HTML>
+<html lang="en-GB">
+<head>
+	<meta charset="utf-8">
+	<title>building things  | amanda himmelstoss</title>
+
+	<meta name="author" content="amanda himmelstoss">
+
+<meta name="description" content=" test "> <meta name="keywords" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="amanda himmelstoss" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">amanda himmelstoss</a></h1>
+<span class="tagline">building things</span>
+<nav id="main-nav"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</div>
+	</div>
+</nav>
+
+
+</header>
+
+	<div id="content" class="inner">
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2014/01/06/test-blog-post/">
+			
+				Test Blog Post</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-06T23:50:00-05:00" pubdate data-updated="true">Jan 6<span>th</span>, 2014</time></div>
+	</header>
+	<div class="entry-content">
+		<p>test</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2014/01/06/notes-on-sql/">
+			
+				Notes on SQL</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-06T21:47:00-05:00" pubdate data-updated="true">Jan 6<span>th</span>, 2014</time></div>
+	</header>
+	<div class="entry-content">
+		<p>In part with my PHP learning, I am reading Larry Ullman&rsquo;s <a href="http://www.amazon.com/PHP-MySQL-Dynamic-Web-Sites/dp/0321784073">PHP and MySQL for Dynamic Websites</a>, which has been reintroducing me to raw SQL statements, after living in Railsland for the last two months. I had forgotten how much I love SQL, for its clean querying and data organizing.</p>
+
+<p>One thing that we were left to think about at Flatiron was the idea of code as a story. Code tells the story of your web application: there&rsquo;s the setting, characters, and information about the characters. Databases are the heart of that story, because they illustrate the connections between your code&rsquo;s characters. And SQL&rsquo;s <code>JOIN</code> query is at the heart of how these connections are told.</p>
+
+<p>As a refresher, <code>JOIN</code> is a query that uses two or more tables, essentially creating a virtual table between them (you never really see this table, however). The most common join, and the focus of my post is the inner join. An inner join returns all of the database records from the named tables where a match is made on the specified criteria.</p>
+
+<p>I&rsquo;m going to be lazy about my examples here and adapt them from Larry Ullman&rsquo;s forum. A brief synopsis of the story about the forum. This database has messages table (a message has a subject, name, message, posted date, etc), a forum table (a forum has a subject), and users table (a user has a name, email, password, etc). On these tables, there are primary keys as integers. The relationship is that a message has one user and one forum (so there are foreign keys* for both on the messages table).</p>
+
+<p>Let&rsquo;s say I want to find all of the messages on a forum that have the subject &ldquo;Cats&rdquo;. There are three ways to do this.</p>
+
+<p>The first does not actually utilize a <code>JOIN</code> statement:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='mysql'><span class='line'><span class="k">SELECT</span> <span class="n">m</span><span class="p">.</span><span class="n">message_id</span><span class="p">,</span> <span class="n">m</span><span class="p">.</span><span class="n">subject</span><span class="p">,</span> <span class="n">f</span><span class="p">.</span><span class="n">subject</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span> <span class="k">AS</span> <span class="n">m</span><span class="p">,</span> <span class="n">forums</span> <span class="k">AS</span> <span class="n">f</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">m</span><span class="p">.</span><span class="n">forum_id</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">forum_id</span> <span class="k">AND</span> <span class="n">f</span><span class="p">.</span><span class="n">subject</span> <span class="o">=</span> <span class="s2">&quot;Cats&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The downside of running this query is that it overloads the <code>WHERE</code> clause, both limiting (where the forum_ids match) and describing (the forum subject as &ldquo;Cats&rdquo;). This isn&rsquo;t necessarily more expensive on the database, but it is not the clearest way to query.</p>
+
+<p>Using a <code>JOIN</code> is cleaner and more descriptive:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='mysql'><span class='line'><span class="k">SELECT</span> <span class="n">m</span><span class="p">.</span><span class="n">message_id</span><span class="p">,</span> <span class="n">m</span><span class="p">.</span><span class="n">subject</span><span class="p">,</span> <span class="n">f</span><span class="p">.</span><span class="n">subject</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span> <span class="k">AS</span> <span class="n">m</span> <span class="k">JOIN</span> <span class="n">forums</span> <span class="k">AS</span> <span class="n">f</span>
+</span><span class='line'><span class="k">ON</span> <span class="n">m</span><span class="p">.</span><span class="n">forum_id</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">forum_id</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">f</span><span class="p">.</span><span class="n">subject</span> <span class="o">=</span> <span class="s2">&quot;Cats&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here I&rsquo;m using the <code>ON</code> clause to describe the relationship between the forum_id in the forum&rsquo;s table and the forum_id (as a foreign key) on the messages table.</p>
+
+<p>For some syntactic sugar, there&rsquo;s an even nicer way to write this with a <code>USING</code> clause:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='mysql'><span class='line'><span class="k">SELECT</span> <span class="n">m</span><span class="p">.</span><span class="n">message_id</span><span class="p">,</span> <span class="n">m</span><span class="p">.</span><span class="n">subject</span><span class="p">,</span> <span class="n">f</span><span class="p">.</span><span class="n">subject</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span> <span class="k">AS</span> <span class="n">m</span> <span class="k">JOIN</span> <span class="n">forums</span> <span class="k">AS</span> <span class="n">f</span>
+</span><span class='line'><span class="k">USING</span> <span class="p">(</span><span class="n">forum_id</span><span class="p">)</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">f</span><span class="p">.</span><span class="n">subject</span> <span class="o">=</span> <span class="s2">&quot;Cats&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A <code>USING</code> clause is only possible if you name your primary key the same way in both tables. In this case, a clean way of doing that is <em>tablename</em>_id.</p>
+
+<p>This is a very common type of query on a database, so writing it the way that seems cleanest is an important practice. I like the sound of the <code>USING</code> clause, so therefore prefer it.</p>
+
+<p>*Foreign keys connect two tables in order to illustrate the relationship between them, and most importantly, to prevent bad data. A message&rsquo;s forum_id as a foreign key points back to a forum&rsquo;s id, signaling that that message belongs to that forum. So if you want to delete an entire forum, having the forum_id on the messages that belong to it prevents you from doing so without first deleting those messages. Without a foreign key in place, you can be left with bad data: messages from a deleted forum are left lying around.</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2013/12/31/the-splfixedarray-class/">
+			
+				The SplFixedArray Class</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-31T18:56:00-05:00" pubdate data-updated="true">Dec 31<span>st</span>, 2013</time></div>
+	</header>
+	<div class="entry-content">
+		<p>Another type of data structure that is unique to PHP is the SplFixedArray. This is a class that embodies much of the same functionality as an indexed array, but performs slightly different.</p>
+
+<p>Arrays in PHP, while functionally similar to arrays in other languages, like Ruby, more closely resemble hashes, as both indexed and associative arrays both use key => value pairs, where the key can be either an integer or a string. However, SplFixedArrays are not unlike arrays found within Ruby. Their indexes are fixed integers, and their performance is better on a large scale than an associative array.</p>
+
+<p>An SplFixedArray has a fixed size (other arrays in PHP can be any size) that is determined in the  instantiation. Below, I&rsquo;ve instantiated a new SplFixedArray (remember, it&rsquo;s a class!) and set four of the values.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$cats</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SplFixedArray</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Maru&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Grumpy Cat&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Nala Cat&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Chairman Meow&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To increase the size of <code>$cats</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$cats</span><span class="o">-&gt;</span><span class="na">setSize</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The value of <code>$cats[4];</code> will be NULL until it&rsquo;s set. (Note that <code>setSize();</code> is a class function.)</p>
+
+<p>The SplFixedArray is a great data structure that is more optimal in some cases, and for the Rubyists who love Ruby arrays, very familiar. :)</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2013/12/27/arrays-in-php/">
+			
+				Arrays in PHP, Continued</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-27T12:38:00-05:00" pubdate data-updated="true">Dec 27<span>th</span>, 2013</time></div>
+	</header>
+	<div class="entry-content">
+		<p>In continuing to learn about arrays and data structures in PHP, I&rsquo;ve been playing around with a few cool functions.</p>
+
+<p><code>array_column();</code> is a handy method in PHP5.5 that returns all of the values of a single column, given the key.</p>
+
+<p>Let&rsquo;s say I had the following associated array:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$catCelebs</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>    <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Maru&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;breed&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Scottish Fold&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">6</span>
+</span><span class='line'>    <span class="p">),</span>
+</span><span class='line'>    <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Nala Cat&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;breed&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Siamese mix&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">3</span>
+</span><span class='line'>    <span class="p">),</span>
+</span><span class='line'>    <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Lil Bub&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;breed&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Domestic Shorthair&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span>
+</span><span class='line'>    <span class="p">),</span>
+</span><span class='line'>    <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Tardar Sauce&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;breed&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Siamese&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;age&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="p">)</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If I wanted all of the cat&rsquo;s names, I would write:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$catNames</span> <span class="o">=</span> <span class="nx">array_column</span><span class="p">(</span><span class="nv">$catCelebs</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>array_key_exists();</code> is a function that checks if an array contains a given key, returning true or false.</p>
+
+<p>From <code>$catCelebs</code> above, if I wanted to check if age was an included column, I would write:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">array_key_exists</span><span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="nv">$catCelebs</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="s2">&quot;We know the ages of the celebrity cats!&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Similar to this are two other useful functions that allow you to search arrays: <code>in_array();</code> searches an array for a value and returns true or false if it exists, and <code>array_search();</code> looks for a value and returns its key if it exists, and false otherwise.</p>
+
+<p><code>array_unique();</code>, much like the name suggests, will remove duplicates from a given array, the return of that being a new array. This function does not change the original array, so reassignment would be necessary.</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2013/12/26/forms-in-php/">
+			
+				Forms in PHP</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-26T20:37:00-05:00" pubdate data-updated="true">Dec 26<span>th</span>, 2013</time></div>
+	</header>
+	<div class="entry-content">
+		<p>Today I continued in my exercise in familiarizing myself with PHP&rsquo;s syntax. I rewrote an old program I did two months ago in Ruby, a <a href="http://ahimmelstoss.github.io/blog/2013/10/17/roman-numerals-converter-explained/">Roman Numerals Converter</a>, drilling in classes, array iterations, and few new methods and tricks (like the <code>end();</code> method that gives you the last element in an array).</p>
+
+<p>I decided to turn this converter into something interactive, using good ol&#8217; HTML forms. One of the cool things about PHP is that you can get a dynamic website up and going pretty quick, without a framework in place, so making a converter where a user can enter a number and get back the Roman numeral for that was relatively quick and clean. In fact, rendering HTML forms with PHP is not unlike ERB (embedded Ruby).</p>
+
+<p>In a .php file, you set up your HTML as you like, and if your logic isn&rsquo;t in the file (I think best practices is to keep logic and rendering separate), you be sure to <code>include();</code> the file you wish to use. Be sure to <code>include();</code> above where you want to work with it on the page.</p>
+
+<p>I&rsquo;ll admit that my time in Rails led me to momentarily forget how to write a traditional form. Mine is relatively simple:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>  <span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;romanconverter.php&quot;</span> <span class="na">method=</span><span class="s">&quot;get&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    Number: <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;number&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;convert!&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/form&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next comes the rendering of that get request. PHP makes this relatively easy:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'>  <span class="o">&lt;?</span><span class="nx">php</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">]))</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="x">  </span><span class="cp">&lt;?php</span> <span class="k">elseif</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nb">is_numeric</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"> </span>
+</span><span class='line'><span class="x">    &lt;p&gt;Your Number: </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">],</span> <span class="nx">ENT_QUOTES</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x">&lt;/p&gt;</span>
+</span><span class='line'><span class="x">    </span><span class="cp">&lt;?php</span>
+</span><span class='line'>    <span class="nv">$myRoman</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Roman</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">]);</span>
+</span><span class='line'>    <span class="nv">$mynumber</span> <span class="o">=</span> <span class="nv">$myRoman</span><span class="o">-&gt;</span><span class="na">toRoman</span><span class="p">();</span>
+</span><span class='line'>    <span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="x">    &lt;p&gt;Roman Number: </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$mynumber</span><span class="p">,</span> <span class="nx">ENT_QUOTES</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"> &lt;/p&gt;</span>
+</span><span class='line'><span class="x">  </span><span class="cp">&lt;?php</span> <span class="k">else</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="x">    &lt;p&gt;Error! Please enter a valid number.&lt;/p&gt;</span>
+</span><span class='line'><span class="x">  </span><span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I included some validation on the <code>$_GET</code> to make sure that something is in the input (<code>isset();</code>), the input is a number (<code>is_numeric();</code>), and that it is greater than 0, as the Roman numerals system does not have a zero. Encapsulated is the calling of a new instance of the <code>Roman</code> class, and the calling of a function within that class converts the number (in PHP, the syntax for calling a class function is different than calling a regular one: <code>$myRoman-&gt;toRoman();</code>). The <code>&lt;?php  ?&gt;</code> brackets around the if, elseif, else, and endif are just one way of embedding PHP into a page (you can instead <code>echo</code> your HTML tags and text within one big PHP block); I think this looks cleaner.</p>
+
+<p>In the lines that render the number, for example: <code>&lt;p&gt;Roman Number: &lt;?php echo htmlentities($mynumber, ENT_QUOTES); ?&gt; &lt;/p&gt;</code>, <code>htmlentities();</code> is a best practices function within PHP that makes sure the dynamic data you&rsquo;re rendering is escaped and always rendered as HTML. The <code>ENT_QUOTES</code> included in the function&rsquo;s parameters is a flag that let&rsquo;s PHP know how to handle quotes: in this case it will convert double and single quotes.</p>
+
+<p>One cool thing about PHP is the <code>$_GET</code> variable; this is called a <code>superglobal</code> array. There is also <code>$_POST</code>, <code>$_REQUEST</code>, <code>$_SERVER</code>, <code>$_ENV</code>, <code>$_SESSION</code>, and <code>$_COOKIE</code>. These superglobal arrays are very similar to <code>params[]</code> found in Ruby on Rails and Sinatra. These arrays are where PHP stores values sent into a script from an HTML from the GET, POST, etc methods. Whereas <code>params[]</code> can hold data from any type of action, the differentiation between get, post, etc gives some added security.</p>
+
+<p>If you want to play with my Roman Numerals Converter, it&rsquo;s <a href="http://www.amandahimmelstoss.com/romanconverter.php">here</a>!</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2013/12/23/arrays-in-php/">
+			
+				Arrays in PHP</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-23T18:42:00-05:00" pubdate data-updated="true">Dec 23<span>rd</span>, 2013</time></div>
+	</header>
+	<div class="entry-content">
+		<p>In Ruby, arrays and hashes are two separate types of data structures. Arrays have elements with corresponding indexes, whereas hashes you can set you own key => value pairs. In PHP, arrays and hashes exist, but are not so mutually exclusive. There are two types of arrays, <code>indexed</code> and <code>associative</code>. Indexed arrays, much like their name suggests, are much like Ruby&rsquo;s arrays, and associative arrays operate much like hashes.</p>
+
+<p>What&rsquo;s interesting about the value of an indexed array is that it resembles that of an associative array: the keys are automatically assigned for you as an index for the values.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="c1">//an indexed array of cat breeds</span>
+</span><span class='line'><span class="nv">$myArray</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;siamese&quot;</span><span class="p">,</span> <span class="s2">&quot;scottish fold&quot;</span><span class="p">,</span> <span class="s2">&quot;calico&quot;</span><span class="p">,</span> <span class="s2">&quot;ragdoll&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="cm">/* → array(</span>
+</span><span class='line'><span class="cm">  0 =&gt; &#39;siamese&#39;,</span>
+</span><span class='line'><span class="cm">  1 =&gt; &#39;scottish fold&#39;,</span>
+</span><span class='line'><span class="cm">  2 =&gt; &#39;calico&#39;,</span>
+</span><span class='line'><span class="cm">  3 =&gt; &#39;ragdoll&#39;</span>
+</span><span class='line'><span class="cm">) */</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//an associative array of one cat</span>
+</span><span class='line'><span class="nv">$maruCat</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;name&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;Maru&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span> <span class="o">=&gt;</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;breed&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;scottish fold&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;Japanese&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="cm">/*  → array(</span>
+</span><span class='line'><span class="cm">  &#39;name&#39; =&gt; &#39;Maru&#39;,</span>
+</span><span class='line'><span class="cm">  &#39;age&#39; =&gt; 6,</span>
+</span><span class='line'><span class="cm">  &#39;breed&#39; =&gt; &#39;scottish fold&#39;,</span>
+</span><span class='line'><span class="cm">  &#39;country&#39; =&gt; &#39;Japanese&#39;</span>
+</span><span class='line'><span class="cm">) */</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Arrays in PHP can also be nested. Below, I&rsquo;ve taken an exercise we did during the first few weeks at Flatiron that gives a nested array of data about some pigeons (<code>$rawPigeonData</code>) and transforms the structure of it into a more organized list with each pigeon&rsquo;s name being the key in the associative array.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="nv">$rawPigeonData</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>  <span class="s2">&quot;color&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>    <span class="s2">&quot;purple&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Theo&quot;</span><span class="p">,</span> <span class="s2">&quot;Peter Jr.&quot;</span><span class="p">,</span> <span class="s2">&quot;Lucky&quot;</span><span class="p">),</span>
+</span><span class='line'>    <span class="s2">&quot;grey&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Theo&quot;</span><span class="p">,</span> <span class="s2">&quot;Peter Jr.&quot;</span><span class="p">,</span> <span class="s2">&quot;Ms .K&quot;</span><span class="p">),</span>
+</span><span class='line'>    <span class="s2">&quot;white&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Queenie&quot;</span><span class="p">,</span> <span class="s2">&quot;Andrew&quot;</span><span class="p">,</span> <span class="s2">&quot;Ms .K&quot;</span><span class="p">,</span> <span class="s2">&quot;Alex&quot;</span><span class="p">),</span>
+</span><span class='line'>    <span class="s2">&quot;brown&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Queenie&quot;</span><span class="p">,</span> <span class="s2">&quot;Alex&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">),</span>
+</span><span class='line'>  <span class="s2">&quot;gender&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>    <span class="s2">&quot;male&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Alex&quot;</span><span class="p">,</span> <span class="s2">&quot;Theo&quot;</span><span class="p">,</span> <span class="s2">&quot;Peter Jr.&quot;</span><span class="p">,</span> <span class="s2">&quot;Andrew&quot;</span><span class="p">,</span> <span class="s2">&quot;Lucky&quot;</span><span class="p">),</span>
+</span><span class='line'>    <span class="s2">&quot;female&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Queenie&quot;</span><span class="p">,</span> <span class="s2">&quot;Ms .K&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">),</span>
+</span><span class='line'>  <span class="s2">&quot;lives&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>    <span class="s2">&quot;Subway&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Theo&quot;</span><span class="p">,</span> <span class="s2">&quot;Queenie&quot;</span><span class="p">),</span>
+</span><span class='line'>    <span class="s2">&quot;Central Park&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Alex&quot;</span><span class="p">,</span> <span class="s2">&quot;Ms .K&quot;</span><span class="p">,</span> <span class="s2">&quot;Lucky&quot;</span><span class="p">),</span>
+</span><span class='line'>    <span class="s2">&quot;Library&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Peter Jr.&quot;</span><span class="p">),</span>
+</span><span class='line'>    <span class="s2">&quot;City Hall&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Andrew&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">)</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>$pigeonList</code> is the new associative array I&rsquo;m going to create by iterating through <code>$rawPigeonData</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="nv">$pigeonList</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">foreach</span> <span class="p">(</span><span class="nv">$rawPigeonData</span> <span class="k">as</span> <span class="nv">$property</span> <span class="o">=&gt;</span> <span class="nv">$valueArray</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">foreach</span> <span class="p">(</span><span class="nv">$valueArray</span> <span class="k">as</span> <span class="nv">$value</span> <span class="o">=&gt;</span> <span class="nv">$pigeonNames</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$pigeonNames</span> <span class="k">as</span> <span class="nv">$name</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$pigeonList</span><span class="p">[</span><span class="nv">$name</span><span class="p">]))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$pigeonList</span><span class="p">[</span><span class="nv">$name</span><span class="p">][</span><span class="nv">$property</span><span class="p">]))</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nb">array_push</span><span class="p">(</span><span class="nv">$pigeonList</span><span class="p">[</span><span class="nv">$name</span><span class="p">][</span><span class="nv">$property</span><span class="p">],</span> <span class="nv">$value</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nv">$pigeonList</span><span class="p">[</span><span class="nv">$name</span><span class="p">][</span><span class="nv">$property</span><span class="p">]</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$pigeonList</span><span class="p">[</span><span class="nv">$name</span><span class="p">]</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="nv">$property</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="nv">$value</span><span class="p">));</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/* The array looks like this once it&#39;s structured:</span>
+</span><span class='line'><span class="cm"> → array(</span>
+</span><span class='line'><span class="cm">  &#39;Theo&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;purple&#39;,</span>
+</span><span class='line'><span class="cm">      1 =&gt; &#39;grey&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;male&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;Subway&#39;</span>
+</span><span class='line'><span class="cm">    )</span>
+</span><span class='line'><span class="cm">  ),</span>
+</span><span class='line'><span class="cm">  &#39;Peter Jr.&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;purple&#39;,</span>
+</span><span class='line'><span class="cm">      1 =&gt; &#39;grey&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;male&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;Library&#39;</span>
+</span><span class='line'><span class="cm">    )</span>
+</span><span class='line'><span class="cm">  ),</span>
+</span><span class='line'><span class="cm">  &#39;Lucky&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;purple&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;male&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;Central Park&#39;</span>
+</span><span class='line'><span class="cm">    )</span>
+</span><span class='line'><span class="cm">  ),</span>
+</span><span class='line'><span class="cm">  &#39;Ms .K&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;grey&#39;,</span>
+</span><span class='line'><span class="cm">      1 =&gt; &#39;white&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;female&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;Central Park&#39;</span>
+</span><span class='line'><span class="cm">    )</span>
+</span><span class='line'><span class="cm">  ),</span>
+</span><span class='line'><span class="cm">  &#39;Queenie&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;white&#39;,</span>
+</span><span class='line'><span class="cm">      1 =&gt; &#39;brown&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;female&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;Subway&#39;</span>
+</span><span class='line'><span class="cm">    )</span>
+</span><span class='line'><span class="cm">  ),</span>
+</span><span class='line'><span class="cm">  &#39;Andrew&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;white&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;male&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;City Hall&#39;</span>
+</span><span class='line'><span class="cm">    )</span>
+</span><span class='line'><span class="cm">  ),</span>
+</span><span class='line'><span class="cm">  &#39;Alex&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;white&#39;,</span>
+</span><span class='line'><span class="cm">      1 =&gt; &#39;brown&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;male&#39;</span>
+</span><span class='line'><span class="cm">    ),</span>
+</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
+</span><span class='line'><span class="cm">      0 =&gt; &#39;Central Park&#39;</span>
+</span><span class='line'><span class="cm">    )</span>
+</span><span class='line'><span class="cm">  )</span>
+</span><span class='line'><span class="cm">)</span>
+</span><span class='line'><span class="cm">*/</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2013/12/20/adventures-in-php/">
+			
+				Adventures in PHP</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-20T17:52:00-05:00" pubdate data-updated="true">Dec 20<span>th</span>, 2013</time></div>
+	</header>
+	<div class="entry-content">
+		<p>LAF (&ldquo;Life after Flatiron&rdquo;) has been a mixture of emotions, but has primarily meant that I&rsquo;m exploring new technologies, languages and stacks. I&rsquo;m currently learning PHP, among other things, for my LAF job. I&rsquo;m finding that PHP isn&rsquo;t very different from Ruby; they&rsquo;re both scripting languages, so logically very similar. Problems I&rsquo;m familiar with in Ruby can be easily solved in PHP, just with a different syntax.</p>
+
+<p>I happily breezed through Codecademy&rsquo;s <a href="http://www.codecademy.com/tracks/php">PHP Track</a>, at a pace that made me feel quite pleased with myself. :) Three months ago, the Ruby Track took more than twice as long to go through.</p>
+
+<p>Once I became familiar with the basic syntax of PHP, I decided to expand my learning by writing some simple programs that I had previously done in Ruby.</p>
+
+<p>First, naturally, was FizzBuzz, written procedurally. For my own clarity and practice, I pushed the fizzes, buzzes, and fizzbuzzes into an array:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>  <span class="k">function</span> <span class="nf">fizzbuzz</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$myFizzBuzzes</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">foreach</span> <span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span> <span class="k">as</span> <span class="nv">$num</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nv">$num</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nv">$num</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+</span><span class='line'>        <span class="nb">array_push</span><span class="p">(</span><span class="nv">$myFizzBuzzes</span><span class="p">,</span> <span class="s2">&quot;FIZZBUZZ&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$num</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nb">array_push</span><span class="p">(</span><span class="nv">$myFizzBuzzes</span><span class="p">,</span> <span class="s2">&quot;fizz&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$num</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nb">array_push</span><span class="p">(</span><span class="nv">$myFizzBuzzes</span><span class="p">,</span> <span class="s2">&quot;buzz&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$myFizzBuzzes</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next, practicing switch statements (like case statements in Ruby), I wrote a vowel checker program. I included some syntactic sugar with the <code>endswitch;</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>  <span class="k">function</span> <span class="nf">isVowel</span><span class="p">(</span><span class="nv">$letter</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">switch</span><span class="p">(</span><span class="nx">strtolower</span><span class="p">(</span><span class="nv">$letter</span><span class="p">))</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s2">&quot;a&quot;</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s2">&quot;e&quot;</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s2">&quot;i&quot;</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s2">&quot;o&quot;</span><span class="o">:</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s2">&quot;u&quot;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nv">$letter</span><span class="si">}</span><span class="s2">&#39; is a vowel.&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s2">&quot;&#39;</span><span class="si">{</span><span class="nv">$letter</span><span class="si">}</span><span class="s2">&#39; is not a vowel.&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">endswitch</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">echo</span> <span class="nx">isVowel</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As a fan of object orientation (being an organizational freak, I guess it makes sense that I would love classes), I created a Triangle class which will return the type of triangle, given the sides. Additionally, I tried my hand at some Exception throwing, which throws an error if the sides do not make a valid triangle. Exceptions, like in Ruby, are classes that your custom class can inherit from.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">TriangleError</span> <span class="k">extends</span> <span class="nx">Exception</span> <span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Triangle</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">public</span> <span class="nv">$side1</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">public</span> <span class="nv">$side2</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">public</span> <span class="nv">$side3</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$side1</span><span class="p">,</span> <span class="nv">$side2</span><span class="p">,</span> <span class="nv">$side3</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">=</span> <span class="nv">$side1</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">=</span> <span class="nv">$side2</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span> <span class="o">=</span> <span class="nv">$side3</span><span class="p">;</span>
+</span><span class='line'>      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">validate</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">validate</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">throw</span> <span class="k">new</span> <span class="nx">TriangleError</span><span class="p">(</span><span class="s2">&quot;error; not valid triangle&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">+</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">&lt;=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span> <span class="o">||</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">+</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span> <span class="o">&lt;=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">+</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span> <span class="o">&lt;=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">throw</span> <span class="k">new</span> <span class="nx">TriangleError</span><span class="p">(</span><span class="s2">&quot;error; not valid triangle&quot;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">kind</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">&amp;&amp;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s2">&quot;equilateral&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side2</span> <span class="o">==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span> <span class="o">||</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side1</span> <span class="o">==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">side3</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s2">&quot;isosceles&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s2">&quot;scalene&quot;</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nv">$myTriangle</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Triangle</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="nv">$myTriangle</span><span class="o">-&gt;</span><span class="na">kind</span><span class="p">();</span>
+</span><span class='line'> <span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2013/11/22/thinking-about-skills/">
+			
+				Thinking About Skills</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-22T23:12:00-05:00" pubdate data-updated="true">Nov 22<span>nd</span>, 2013</time></div>
+	</header>
+	<div class="entry-content">
+		<p>I feel that one of the main challenges I had with of doing liberal arts in college is feeling that given the breadth of my learning, I always felt that my skillset wasn&rsquo;t easily quantifiable. I remember first seriously writing a resume around sophomore year, having attended a Career Development workshop on the topic. I had just declared my major, Anthropology, and I was applying for an internship at the American Museum of Natural History. Part of writing my first resume, given that my only experience was my high school job at the supermarket, was coming up with a list of skills I had.</p>
+
+<p>I remember writing things like: excellent communication, organized, hardworking. Given my lack of experience, this was all I could muster. But these aren&rsquo;t necessarily skills, but more like qualities; as in, these are not what I&rsquo;m capable of, but what I am. Throughout my time in college, and a little while after, this skills section of my resume changed minimally. I added a few things like proficient in Microsoft Office, the ability to work well with others and independently, and 80 WPM, but I still lacked definable skills, albeit I had more experience.</p>
+
+<p>I learned quite a bit studying Anthropology and having taking many different courses, and I don&rsquo;t regret it for a second that I got to spend 4 years critically engaged in ideas I find fascinating, engaging, and relevant. Still, by senior year of college, I was aware, intrinsically, that I didn&rsquo;t really have many concrete skills aside from writing and critical thinking. Maybe recent graduates don&rsquo;t yet, which is expected, but I also didn&rsquo;t have a good idea of how to really get &ldquo;skills&rdquo; to compete in the job market (and, for that matter, what type of job I wanted and that would be fulfilling to me).</p>
+
+<p>Here, more than halfway though our course, I&rsquo;m finding myself looking back on this period of my life with a mixture of emotions. For one, I think of my life in two phases: before starting Flatiron, and the possibilities beyond. I think about it this way for a number of awesome reasons too long to list in one post, but for one, I feel for the first time that I have real skills that I can point to and say that I know.</p>
+
+<p>Before Flatiron, I had thought I wanted to go to graduate school for anthropology, given my love of studying it in undergrad. Part of my desire to go was from a lack of not knowing what I was capable of doing beyond that, as well as sticking with things I&rsquo;m good at, and not taking risks in learning things outside of my comfort zone. At the same time, I&rsquo;ve always loved technology and the internet and thinking about what that all means for our world and society, yet I never thought myself capable of actually building things that would contribute to that. I thought it was magic, and I thought I was only inclined to liberal arts, as a critical thinker, and not a quantitatively capable. I felt like I was taught, implicitly, that studying liberal arts meant I would not be capable of learning a hard skill like programming. Part of that is because these skills are not taught in a traditional academic setting. Part of that as well is attending a women&rsquo;s college and not knowing many people, especially women, in technology.</p>
+
+<p>It&rsquo;s hard for me to articulate the feeling of being so utterly wrong about my capabilities, yet so happy about that at the same time. Finishing week 9 out of 12 of our semester, I feel elated by the fact that I have a skillset that I can objectively speak about with enthusiasm and excitement. Further, I can point to things that I&rsquo;ve made, that can be used by anyone (this week I helped build <a href="http://guideme.herokuapp.com/">GuideMe</a>). I&rsquo;m also consistently inspired to learn more about new topics and to code code code all the time. To enter states of complete flow everyday is invigorating, and to think I can do this for a career is actually magical.</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2013/11/17/javascript-vs-ruby/">
+			
+				JavaScript vs. Ruby</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-17T14:49:00-05:00" pubdate data-updated="true">Nov 17<span>th</span>, 2013</time></div>
+	</header>
+	<div class="entry-content">
+		<p>After beginning JavaScript last Thursday, I&rsquo;ve been thinking about the differences between this language and Ruby, whom I&rsquo;ve gotten quite intimate with these last 7 weeks. Coming from Ruby, JavaScript isn&rsquo;t all that different, yet the syntax is unfamiliar and some logic differs slightly.</p>
+
+<p><strong><code>typeof</code> vs <code>class</code></strong></p>
+
+<p>To determine what type of value something is (a number, a fixnum, a string, an Object, an array, etc), in JavaScript you write <code>typeof</code> and then then the object; in Ruby, you append <code>.class</code> to the end of the object.</p>
+
+<p><strong><code>===</code> vs <code>==</code></strong></p>
+
+<p>In JavaScript, the triple equals sign helps determine if two objects are the same exact object (having the same <code>typeof</code> and the same value). For example:
+<code>3 === 3</code> returns <code>true</code>
+In Ruby, that is accomplished through the double equals. (<code>3 == 3</code> returns <code>true</code>)</p>
+
+<p>JavaScript has its own double equals, which shouldn&rsquo;t be confused with Ruby&rsquo;s: double equals in JavaScript only determines if the values match. For example:
+<code>"3" == 3</code> returns <code>true</code></p>
+
+<p><strong><code>parseInt();</code> vs <code>.to_i</code></strong></p>
+
+<p>In JavaScript, to turn a string &ldquo;10&rdquo; into the integer 10, you write <code>parseInt("10");</code>. In Ruby, you write <code>"10".in_i</code>.</p>
+
+<p><strong>Incrementing and Decrementing</strong></p>
+
+<p>To increment or decrement by 1 in JavaScript, you can write <code>++</code> or <code>--</code> (for example, <code>var x = 2; x++;</code> returns <code>3</code>. In Ruby, it&rsquo;s <code>x += 1</code>. You can write this as well in JavaScript (which is useful if you want to increment with numbers other than 1), however, you have the handy <code>++</code> and <code>--</code> as well.</p>
+
+<p><strong>Functions</strong></p>
+
+<p>Functions in JavaScript are the same as methods in Ruby. The syntax of declaring a function vs. declaring a method is slightly different. In Ruby, it&rsquo;s :</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">hello</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;hello&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In JavaScript, the same logic can be written as:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">hello</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>Objects</strong></p>
+
+<p>Objects (similar to Ruby&rsquo;s hash), declared as variables, are a way of organizing key/value pairs. For example, <code>var cat = {color: "grey", name: "Spot", age: "12"};</code>
+To access the value of an associated key, you can call that on the variable name:
+<code>cat.name</code> returns <code>"Spot"</code>. You can also easily delete a key/value pair by writing <code>delete cat.name</code>. To declare a new key/value pair, write: <code>cat.gender = "male";</code>. This appends this new data point to the end of the Object.</p>
+
+<p><strong>Arrays</strong></p>
+
+<p>Both Ruby and JavaScript have Arrays, which are more of less logically the same; however, the Object Array functions (JavaScript) and the Class Array methods (Ruby) have different syntax.
+For example, to find the index of an element in an array, in JavaScript you write <code>arrayName.indexOf("element");</code>. In Ruby, this is accomplished by <code>array_name.index("element")</code></p>
+
+<p><strong><code>each</code></strong></p>
+
+<p>The method <code>each</code> in Ruby is a handy way of iterating through an array of elements in order to change or manipulate them. JavaScript as well as an <code>each</code> function that does the same thing; however, the syntax is slightly different:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">];</span>
+</span><span class='line'><span class="nx">a</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">n</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And in Ruby, the same is written as:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">arr</span> <span class="o">=</span> <span class="o">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">a</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span><span class="o">|</span><span class="n">n</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">n</span><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">#or</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">a</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">n</span><span class="o">|</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="n">n</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>Falsey Values</strong></p>
+
+<p>One big difference between Ruby and JavaScript is the falsey-ness of certain values. Like in Ruby, null (in Ruby, it&rsquo;s nil) and false will return false, however, some truthful values in Ruby will return false in JavaScript, like <code>0</code>, empty strings (<code>""</code>), and <code>undefined</code>.</p>
+
+<p><strong>Object Oriented Programming</strong></p>
+
+<p>JavaScript, like Ruby, can be object-oriented, meaning that objects, their associated methods/functions, can be neatly contained. In JavaScript, a Prototype is much like Ruby&rsquo;s Class. To create a new Prototype in JavaScript:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Cat</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">age</span><span class="p">,</span> <span class="nx">gender</span><span class="p">){</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">age</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">age</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">gender</span> <span class="o">=</span> <span class="nx">gender</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">meow</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;meow, my name is &quot;</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="o">+</span><span class="s2">&quot;! I am &quot;</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">age</span><span class="o">+</span><span class="s2">&quot; years old.&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">maruCat</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Cat</span><span class="p">(</span><span class="s2">&quot;Maru&quot;</span><span class="p">,</span> <span class="s2">&quot;6&quot;</span><span class="p">,</span> <span class="s2">&quot;male&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">maruCat</span><span class="p">.</span><span class="nx">meow</span><span class="p">();</span> <span class="c1">//meow, my name is Maru! I am 6 years old.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>maruCat</code> object is considered a new instance of the Cat prototype. Prototype is essentially the same as Class in Ruby. Note that <code>this</code> in JavaScript is the same concept as <code>self</code> in Ruby.</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2013/10/27/a-simple-sinatra-buzzer-app/">
+			
+				A Simple Sinatra Buzzer App</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-10-27T23:03:00-04:00" pubdate data-updated="true">Oct 27<span>th</span>, 2013</time></div>
+	</header>
+	<div class="entry-content">
+		<p>This weekend, I wrote a simple door buzzer app that requires authentication before execution. The point of this is to be able to buzz open our downstairs doors from anywhere (particularly useful when hosting airbnb guests). My boyfriend did all of the methanical work: we got a raspberry pi (which we turned into a server to host the app) and a relay to connect that to the door buzzer (there was sautering and wires involved; I just watched). Through that, it&rsquo;s possible to trigger the buzzer from the command line of the raspberry pi. We (well, mostly my boyfriend; I, again, just really watched) wrote a simple C command to trigger the buzzer for 5 seconds, long enough for someone to get through both doors downstairs:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /sys/class/gpio
+</span><span class='line'>echo 2 &gt; export
+</span><span class='line'>echo out &gt; gpio2/direction
+</span><span class='line'>echo 0 &gt; gpio2/value
+</span><span class='line'>sleep 5
+</span><span class='line'>echo 1 &gt; gpio2/value</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img src="/images/buzzer.jpg" width="400" height="400" title="buzzer" ></p>
+
+<p>I approached this project not necessarily as a big challenge, but as a way to drill in the skills we&rsquo;ve been working on this week into a cool, useful project. This is the second personal project I&rsquo;ve worked on during school, but one that was most rewarding. To see all the components come together to make something that is truly useful was super awesome for me. I had been vaguely envisioning writing a door buzzer app for quite sometime, but I didn&rsquo;t have the skills yet to accomplish that. It was an empowering to realize I was at a point in my learning where I could build something that 4 weeks ago, I wouldn&rsquo;t have known how to even begin building.</p>
+
+<p>This was an exercise in Sinatra, Ruby, ERB/HTML, SQLite/Sequel/migrations, and general project organization. From scratch I had to set of the program environment and config.ru files, which I can always use some practice with. I won&rsquo;t bore you with that part, but instead get to the meat of the application.</p>
+
+<p>I have only two models in this application: <code>Buzzer</code> and <code>User</code>.</p>
+
+<p><code>Buzzer</code> only knows how to do one thing right now, which is trigger the C command that in turn triggers the buzzer itself:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">open_door</span>
+</span><span class='line'>      <span class="nb">system</span><span class="p">(</span><span class="s2">&quot;/usr/local/sbin/open-buzzer&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>User</code> is more advanced, because it interacts with the database, which I created with Sequel and migration methods. <code>User</code> could have used more advanced authentication methods, or even integrated the <a href="https://github.com/maxjustus/sinatra-authentication">sinatra-authentication</a> gem, but I thought it was best to keep it simple given the nature of the project.</p>
+
+<p>The app requires you to log in in order to trigger the buzzer, but there&rsquo;s no way to sign up to that. Usernames and passwords can only be entered manually into the database. So therefore, <code>User</code>&rsquo;s only tasks are to know if inputed usernames and passwords correspond with that is in the database:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="ss">Sequel</span><span class="p">:</span><span class="ss">:Model</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">username?</span><span class="p">(</span><span class="n">login_username</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">login_username</span> <span class="o">==</span> <span class="n">username</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">password?</span><span class="p">(</span><span class="n">login_password</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">login_password</span> <span class="o">==</span> <span class="n">password</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Like many of my classmates, I&rsquo;m a bit in love with Sinatra. I know nothing else to compare it to, so it&rsquo;s hard to give a solid argument why, but I love it for its simplicity and for its ability to teach me how websites are structured. <code>BuzzerApp</code> is rather simple, but it drives home web app structure for me, and gets the job done, which is great.</p>
+
+<p>There are only three pages in the app: <code>login</code>, which authenticates the username and password input fields, <code>success</code> which lets you know you&rsquo;re in, and <code>failure</code>, which lets you know you don&rsquo;t have access. It&rsquo;s simple for a reason: there&rsquo;s no way for you to buzz in without entering a username and password, because a) there are no cookie sessions, and b) because an instance of <code>Buzzer</code> is only triggered through <code>/login</code>&rsquo;s POST. The bulk of the app is within <code>login</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">BuzzerApp</span> <span class="o">&lt;</span> <span class="ss">Sinatra</span><span class="p">:</span><span class="ss">:Base</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="n">get</span> <span class="s1">&#39;/&#39;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">redirect</span> <span class="s1">&#39;/login&#39;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">get</span> <span class="s1">&#39;/login&#39;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">erb</span> <span class="ss">:login</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">post</span> <span class="s1">&#39;/login&#39;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">login</span> <span class="o">=</span> <span class="no">User</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="ss">username</span><span class="p">:</span> <span class="n">params</span><span class="o">[</span><span class="ss">:username</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span> <span class="o">!</span><span class="n">login</span><span class="o">.</span><span class="n">nil?</span>  <span class="o">&amp;&amp;</span> <span class="n">login</span><span class="o">.</span><span class="n">username?</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:username</span><span class="o">]</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">login</span><span class="o">.</span><span class="n">password?</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:password</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>          <span class="n">buzz</span> <span class="o">=</span> <span class="no">Buzzer</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>          <span class="n">buzz</span><span class="o">.</span><span class="n">open_door</span>
+</span><span class='line'>          <span class="n">redirect</span> <span class="s1">&#39;/success&#39;</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>          <span class="n">redirect</span> <span class="s1">&#39;/failure&#39;</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">get</span> <span class="s1">&#39;/success&#39;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">erb</span> <span class="ss">:success</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">get</span> <span class="s1">&#39;/failure&#39;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">erb</span> <span class="ss">:failure</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Below are the pages rendered by the .erb templates, which could use some styling, although the cats obviously make up for that:</p>
+
+<p><img src="/images/login.png" width="600" height="600" title="login" ></p>
+
+<p><img src="/images/success.png" width="600" height="600" title="success" ></p>
+
+<p><img src="/images/failure.png" width="600" height="600" title="failure" ></p>
+
+<p>Soon I hope to expand on this project to be able to receive output from the buzzer (to be notified when someone buzzes and then be able to respond with triggering the buzzer). Additionally, I am working on an email notification feature that will notify the administrator each time the buzzer is triggered. My takeaway from this, besides a super useful application, is that sometimes the best tools for a project are the most simple ones. Also, that Sinatra is awesome. :)</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <nav id="pagenavi">
+        
+        
+            <a href="/blog/page/2/" class="next">Next</a>
+        
+    </nav>
+
+</div>
+	<footer id="footer" class="inner">&copy; 2014
+
+    amanda himmelstoss
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/hyphenator.js"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'buildingthings';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+</body>
+</html>
