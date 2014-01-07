@@ -4,13 +4,22 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2014-01-06T23:43:12-05:00</updated>
+  <updated>2014-01-06T23:52:11-05:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
     
   </author>
 
+  
+  <entry>
+    <title type="html"><![CDATA[test blog post]]></title>
+    <link href="http://ahimmelstoss.github.io/blog/2014/01/06/test-blog-post/"/>
+    <updated>2014-01-06T23:50:00-05:00</updated>
+    <id>http://ahimmelstoss.github.io/blog/2014/01/06/test-blog-post</id>
+    <content type="html"><![CDATA[<p>test</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Notes on SQL]]></title>
