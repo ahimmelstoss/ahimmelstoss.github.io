@@ -4,13 +4,77 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2014-01-04T21:38:25-05:00</updated>
+  <updated>2014-01-06T22:57:10-05:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
     
   </author>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Notes on SQL]]></title>
+    <link href="http://ahimmelstoss.github.io/blog/2014/01/06/notes-on-sql/"/>
+    <updated>2014-01-06T21:47:00-05:00</updated>
+    <id>http://ahimmelstoss.github.io/blog/2014/01/06/notes-on-sql</id>
+    <content type="html"><![CDATA[<p>In part with my PHP learning, I am reading Larry Ullman&rsquo;s <a href="http://www.amazon.com/PHP-MySQL-Dynamic-Web-Sites/dp/0321784073">PHP and MySQL for Dynamic Websites</a>, which has been reintroducing me to raw SQL statements, after living in Railsland for the last two months. I had forgotten how much I love SQL, for its clean querying and data organizing.</p>
+
+<p>One thing that we were left to think about at Flatiron was the idea of code as a story. Code tells the story of your web application: there&rsquo;s the setting, characters, and information about the characters. Databases are the heart of that story, because they illustrate the connections between your code&rsquo;s characters. And SQL&rsquo;s <code>JOIN</code> query is at the heart of how these connections are told.</p>
+
+<p>As a refresher, <code>JOIN</code> is a query that uses two or more tables, essentially creating a virtual table between them (you never really see this table, however). The most common join, and the focus of my post is the inner join. An inner join returns all of the database records from the named tables where a match is made on the specified criteria.</p>
+
+<p>I&rsquo;m going to be lazy about my examples here and adapt them from Larry Ullman&rsquo;s forum. A brief synopsis of the story about the forum. This database has messages table (a message has a subject, name, message, posted date, etc), a forum table (a forum has a subject), and users table (a user has a name, email, password, etc). On these tables, there are primary keys as integers. The relationship is that a message has one user and one forum (so there are foreign keys* for both on the messages table).</p>
+
+<p>Let&rsquo;s say I want to find all of the messages on a forum that have the subject &ldquo;Cats&rdquo;. There are three ways to do this.</p>
+
+<p>The first does not actually utilize a <code>JOIN</code> statement:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='mysql'><span class='line'><span class="k">SELECT</span> <span class="n">m</span><span class="p">.</span><span class="n">message_id</span><span class="p">,</span> <span class="n">m</span><span class="p">.</span><span class="n">subject</span><span class="p">,</span> <span class="n">f</span><span class="p">.</span><span class="n">subject</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span> <span class="k">AS</span> <span class="n">m</span><span class="p">,</span> <span class="n">forums</span> <span class="k">AS</span> <span class="n">f</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">m</span><span class="p">.</span><span class="n">forum_id</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">forum_id</span> <span class="k">AND</span> <span class="n">f</span><span class="p">.</span><span class="n">subject</span> <span class="o">=</span> <span class="s2">&quot;Cats&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The downside of running this query is that it overloads the <code>WHERE</code> clause, both limiting (where the forum_ids match) and describing (the forum subject as &ldquo;Cats&rdquo;). This isn&rsquo;t necessarily more expensive on the database, but it is not the clearest way to query.</p>
+
+<p>Using a <code>JOIN</code> is cleaner and more descriptive:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='mysql'><span class='line'><span class="k">SELECT</span> <span class="n">m</span><span class="p">.</span><span class="n">message_id</span><span class="p">,</span> <span class="n">m</span><span class="p">.</span><span class="n">subject</span><span class="p">,</span> <span class="n">f</span><span class="p">.</span><span class="n">subject</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span> <span class="k">AS</span> <span class="n">m</span> <span class="k">JOIN</span> <span class="n">forums</span> <span class="k">AS</span> <span class="n">f</span>
+</span><span class='line'><span class="k">ON</span> <span class="n">m</span><span class="p">.</span><span class="n">forum_id</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">forum_id</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">f</span><span class="p">.</span><span class="n">subject</span> <span class="o">=</span> <span class="s2">&quot;Cats&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here I&rsquo;m using the <code>ON</code> clause to describe the relationship between the forum_id in the forum&rsquo;s table and the forum_id (as a foreign key) on the messages table.</p>
+
+<p>For some syntactic sugar, there&rsquo;s an even nicer way to write this with a <code>USING</code> clause:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='mysql'><span class='line'><span class="k">SELECT</span> <span class="n">m</span><span class="p">.</span><span class="n">message_id</span><span class="p">,</span> <span class="n">m</span><span class="p">.</span><span class="n">subject</span><span class="p">,</span> <span class="n">f</span><span class="p">.</span><span class="n">subject</span>
+</span><span class='line'><span class="k">FROM</span> <span class="n">messages</span> <span class="k">AS</span> <span class="n">m</span> <span class="k">JOIN</span> <span class="n">forums</span> <span class="k">AS</span> <span class="n">f</span>
+</span><span class='line'><span class="k">USING</span> <span class="p">(</span><span class="n">forum_id</span><span class="p">)</span>
+</span><span class='line'><span class="k">WHERE</span> <span class="n">f</span><span class="p">.</span><span class="n">subject</span> <span class="o">=</span> <span class="s2">&quot;Cats&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A <code>USING</code> clause is only possible if you name your primary key the same way in both tables. In this case, a clean way of doing that is <em>tablename</em>_id.</p>
+
+<p>This is a very common type of query on a database, so writing it the way that seems cleanest is an important practice. I like the sound of the <code>USING</code> clause, so therefore prefer it.</p>
+
+<p>*Foreign keys connect two tables in order to illustrate the relationship between them, and most importantly, to prevent bad data. A message&rsquo;s forum_id as a foreign key points back to a forum&rsquo;s id, signaling that that message belongs to that forum. So if you want to delete an entire forum, having the forum_id on the messages that belong to it prevents you from doing so without first deleting those messages. Without a foreign key in place, you can be left with bad data: messages from a deleted forum are left lying around.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[The SplFixedArray Class]]></title>
