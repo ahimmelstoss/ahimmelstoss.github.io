@@ -1,0 +1,39 @@
+JavaScript vs Ruby:
+
+<ol>
+    <li>`typeof` vs `class`</li>
+    To determine what type of value something is (a number, a fixnum, a string, an Object, an array, etc), in JavaScript you write `typeof` and then then the object; in Ruby, you append `.class` to the end of the object.
+
+    <li>`===` vs `==`</li>
+    In JavaScript, the triple equals sign helps determine if two objects are the same exact object (having the same `typeof` and the same value). For example:
+    `3 === 3` returns `true`
+    In Ruby, that is accomplished through the double equals. (`3 == 3` returns `true`)
+
+    JavaScript has its own double equals, which shouldn't be confused with Ruby's: double equals in JavaScript only determines if the values match. For example:
+    `"3" == 3` returns `true`
+
+    <li>'parseInt` vs `.to_i`</li>
+    In JavaScript, to turn a string "10" into the integer `10`, you write `parseInt("10")`. In Ruby, you write `"10".in_i`.
+
+    <li>Incrementing and Decrementing</li>
+    To increment or decrement by 1 in JavaScript, you can write `++` or `--`. In Ruby, it's `x += 1`. You can write this as well in JavaScript, however, you have the handy `++` as well.
+
+    <li>Functions</li>
+    Functions in JavaScript are the same as methods in Ruby. The syntax of declaring a function vs. declaring a method is slightly different. In Ruby, it's :
+    ```ruby
+    def hello
+      puts "hello"
+    end
+    ```
+    In JavaScript, the same logic can be written as:
+    ```javascript
+    function hello() {
+      console.log("hello");
+    }
+    <li>Objects</li>
+    Objects (similar to Ruby's hash), declared as variables, are a way of organizing key/value pairs. For example, `var cat = {color: "grey", name: "Spot", age: "12"};`
+    To access the value of an associated key, you can call that on the variable name:
+    `cat.name` returns `"Spot"`. You can also easily delete a key/value pair by writing `delete cat.name`. To declare a new key/value pair, write: `cat.gender = "male";`. This appends this new data point to the end of the Object.
+</ol>
+
+
