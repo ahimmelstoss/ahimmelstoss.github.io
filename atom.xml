@@ -4,13 +4,56 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2014-01-07T01:34:30-05:00</updated>
+  <updated>2014-01-09T23:45:27-05:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
     
   </author>
 
+  
+  <entry>
+    <title type="html"><![CDATA[FULLTEXT in MySQL]]></title>
+    <link href="http://ahimmelstoss.github.io/blog/2014/01/09/fulltext-in-mysql/"/>
+    <updated>2014-01-09T20:11:13-05:00</updated>
+    <id>http://ahimmelstoss.github.io/blog/2014/01/09/fulltext-in-mysql</id>
+    <content type="html"><![CDATA[<p>When querying your database of cats (as one does) using MySQL, sometimes a simple <code>SELECT * FROM cats WHERE bio LIKE 'boxes';</code> isn&rsquo;t strong enough (this query would obviously return many cats). Instead, a <code>FULLTEXT</code> search is more nuanced, allowing you to run more explicit and multi-worded queries on your database.</p>
+
+<p>There is one thing to first think about in regards to <code>FULLTEXT</code>. First, depending on the version of MySQL you are using, <code>FULLTEXT</code> may only work on a MyISAM type table (as of <a href="http://dev.mysql.com/doc/refman/5.6/en/innodb-table-and-index.html#innodb-fulltext-index">5.6</a>, InnoDB also supports <code>FULLTEXT</code>). I could write a whole post about the differences between MyISAM and InnoDB, but for now, <a href="http://stackoverflow.com/questions/15678406/when-to-use-myisam-and-innodb">this</a> Stack Overflow post sums it up nicely instead.</p>
+
+<p>Once you know your engine type and its <code>FULLTEXT</code> search capabilities, the first step is to make sure that the columns you want to query are indexed for <code>FULLTEXT</code>. If your table is already created, the <code>ALTER</code> command is necessary to change it.</p>
+
+<p>In my table Cats, there are the following columns: <code>cat_id</code>, <code>name</code>, <code>age</code>, <code>gender</code>, <code>breed</code>, <code>location</code>, and <code>bio</code>. Let&rsquo;s say I want to be able to run a <code>FULLTEXT</code> search on cats&#8217; biographies:</p>
+
+<p><code>ALTER TABLE cats ADD FULLTEXT (bio);</code></p>
+
+<p>Running a <code>FULLTEXT</code> search is simple with the use of a <code>WHERE</code> clause, with a <code>MATCH...AGAINST</code> added in:</p>
+
+<p><code>SELECT name, bio FROM cats WHERE MATCH (bio) AGAINST ('boxes Japan');</code></p>
+
+<p>(In my example, this would return Maru.)</p>
+
+<p><code>FULLTEXT</code> has some important rules. Keywords that are less than four characters will be ignored; popular words (stopwords, like &lsquo;and&rsquo;, &lsquo;the&rsquo;, etc.) are also ignored; and, if more than half of the record match the keywords, the query won&rsquo;t return anything at all. This last one is important and should be remembered, as you can become puzzled when your search returns nothing. This is because <code>FULLTEXT</code> wants to return relevant, specific results.</p>
+
+<p>There are also some useful parameters that can help querying even further. Add <code>IN BOOLEAN MODE</code> to the <code>AGAINST</code> clause, and you can further specify if a word must be included (&lsquo;+boxes&rsquo;) or excluded (&lsquo;-California&rsquo;), as well as a word and its variations (the wildcard: &lsquo;box*&rsquo; can return &lsquo;box&rsquo; and &lsquo;boxes&rsquo;). It should be noted if you&rsquo;re using boolean mode, the results will not be ordered or sorted by relevance. An <code>ORDER BY</code> clause after the <code>AGAINST</code> clause with the parameters you need will do this. Borrowing from my previous example, let&rsquo;s say I&rsquo;m looking for cats who like boxes, but I&rsquo;m most interested in those who also live in Japan:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>SELECT name, bio, 
+</span><span class='line'>  MATCH (bio) AGAINST ('boxes &gt;Japan' IN BOOLEAN MODE) 
+</span><span class='line'>  AS japanese_box_relevance 
+</span><span class='line'>FROM cats 
+</span><span class='line'>WHERE MATCH (bio) AGAINST ('boxes &gt;Japan' IN BOOLEAN MODE) 
+</span><span class='line'>ORDER BY japanese_box_relevance DESC;</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>FULLTEXT</code> is a great feature of MyISAM/newer InnoDB tables, but there are some drawbacks. If you&rsquo;re strictly InnoDB and using an older version of MySQL, or you have heavy traffic, for example, you may need other options, like a strictly fulltext search server like <a href="http://sphinxsearch.com/about/sphinx/">Sphinx</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Notes on SQL]]></title>
