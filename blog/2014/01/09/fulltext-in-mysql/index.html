@@ -7,7 +7,7 @@
 
 	<meta name="author" content="amanda himmelstoss">
 
-<meta name="description" content="When querying your database of cats (as one does) using MySQL, sometimes a simple SELECT * FROM cats WHERE bio LIKE '%boxes%'; is either strong &hellip;"> <meta name="keywords" content="">
+<meta name="description" content="When querying your database of cats (as one does) using MySQL, sometimes a simple SELECT * FROM cats WHERE bio LIKE '%boxes%'; is either not strong &hellip;"> <meta name="keywords" content="">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -63,7 +63,7 @@
 
 <time datetime="2014-01-09T20:11:13-05:00" pubdate data-updated="true">Jan 9<span>th</span>, 2014</time></div>
 	</header>
-	<div class="entry-content"><p>When querying your database of cats (as one does) using MySQL, sometimes a simple <code>SELECT * FROM cats WHERE bio LIKE '%boxes%';</code> is either strong enough (this query would obviously return many cats), or just inefficient and expensive, as it results in a full table scan. Instead, a <code>FULLTEXT</code> search is more nuanced, allowing you to run more explicit and multi-worded queries on your database.</p>
+	<div class="entry-content"><p>When querying your database of cats (as one does) using MySQL, sometimes a simple <code>SELECT * FROM cats WHERE bio LIKE '%boxes%';</code> is either not strong enough (this query would obviously return many cats), or just inefficient and expensive, as it results in a full table scan. Instead, a <code>FULLTEXT</code> search is more nuanced, allowing you to run more explicit and multi-worded queries on your database.</p>
 
 <p>There is one thing to first think about in regards to <code>FULLTEXT</code>. First, depending on the version of MySQL you are using, <code>FULLTEXT</code> may only work on a MyISAM type table (as of <a href="http://dev.mysql.com/doc/refman/5.6/en/innodb-table-and-index.html#innodb-fulltext-index">5.6</a>, InnoDB also supports <code>FULLTEXT</code>). I could write a whole post about the differences between MyISAM and InnoDB, but for now, <a href="http://stackoverflow.com/questions/15678406/when-to-use-myisam-and-innodb">this</a> Stack Overflow post sums it up nicely instead.</p>
 
