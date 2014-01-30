@@ -1,0 +1,193 @@
+
+<!DOCTYPE HTML>
+<html lang="en-GB">
+<head>
+	<meta charset="utf-8">
+	<title>Closures in PHP  | amanda himmelstoss</title>
+
+	<meta name="author" content="amanda himmelstoss">
+
+<meta name="description" content="Like JavaScript, PHP as well has anonymous functions, also referred to as closures (while related, not the same as closures in functional programming &hellip;"> <meta name="keywords" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="amanda himmelstoss" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">amanda himmelstoss</a></h1>
+<span class="tagline">building things</span>
+<nav id="main-nav"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</div>
+	</div>
+</nav>
+
+
+</header>
+
+	<div id="content" class="inner"><article class="post">
+	<header>
+		<h2 class="title">Closures in PHP</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-29T19:33:12-05:00" pubdate data-updated="true">Jan 29<span>th</span>, 2014</time></div>
+	</header>
+	<div class="entry-content"><p>Like JavaScript, PHP as well has anonymous functions, also referred to as <code>closures</code> (while related, not the same as closures in functional programming). I first came across anonymous functions in JavaScript, but recently learned about their PHP counterpart while playing around with <a href="http://www.slimframework.com/">Slim</a>, a PHP framework not unlike Sinatra, which I ♥. Closures are an important part of route declarations in Slim:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="c1">//taken from the Slim Documentation:</span>
+</span><span class='line'><span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;/hello/:name&#39;</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$name</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">echo</span> <span class="s2">&quot;Hello, </span><span class="si">$name</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The application that I am building on Slim uses Doctrine ORM. The ORM handles object retrieval through the <code>EntityManager</code> class. Using a call to <code>EntityManager</code>, I can access my objects and then be able to use them within my application.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="c1">// obtaining the entity manager; $conn is my database access and $config is my model configuration</span>
+</span><span class='line'><span class="nv">$entityManager</span> <span class="o">=</span> <span class="nx">EntityManager</span><span class="o">::</span><span class="na">create</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nv">$config</span><span class="p">);</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I still needed a way to pass the instance of <code>EntityManager</code> to my Slim routes. One way, of course, would be to make this instance a <code>global</code> variable. While useful, <code>global</code> variables are not the cleanest way to code. I might not want every function in my application to have access to this variable.</p>
+
+<p>However, closures in PHP can inherit variables from the parent scope in a much more controlled and cleaner way with the <code>use</code> construct. The parent scope of the closure is where the closure is declared, and lucky for me, my code is organized as such that my <code>$entityManager</code> declaration lives in that same scope.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;/topics&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span><span class="p">(</span><span class="nv">$entityManager</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">&quot;SELECT t, u FROM Topic t JOIN t.user u ORDER BY t.id DESC&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="nv">$query</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">);</span>
+</span><span class='line'>  <span class="nv">$topics</span> <span class="o">=</span> <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">getResult</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//I&#39;m dynamically doing things with my $topics here</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+	
+		<div class="meta">
+			<span class="comments"><a href="/blog/2014/01/29/closures-in-php/#disqus_thread">Comments</a></span>
+		</div>
+	
+
+</article>
+
+	
+	<div class="share">
+		<ul>
+			<li>
+  <a href="https://twitter.com/intent/tweet?text=Closures in PHP by @ahimmelstoss&url=http://ahimmelstoss.github.io/blog/2014/01/29/closures-in-php/" title="Share Closures in PHP on Twitter">
+    <img src="/images/social/twitter.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://www.facebook.com/sharer.php?u=http://ahimmelstoss.github.io/blog/2014/01/29/closures-in-php/" title="Share Closures in PHP on Facebook">
+    <img src="/images/social/facebook.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://plus.google.com/share?url=http://ahimmelstoss.github.io/blog/2014/01/29/closures-in-php/" title="Share Closures in PHP on Google Plus">
+    <img src="/images/social/google.png" />
+  </a>
+</li>
+
+		</ul>
+	</div>
+
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">&copy; 2014
+
+    amanda himmelstoss
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/hyphenator.js"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'buildingthings';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ahimmelstoss.github.io/blog/2014/01/29/closures-in-php/';
+        var disqus_url = 'http://ahimmelstoss.github.io/blog/2014/01/29/closures-in-php/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+</body>
+</html>

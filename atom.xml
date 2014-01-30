@@ -4,13 +4,75 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2014-01-10T14:36:08-05:00</updated>
+  <updated>2014-01-29T20:51:36-05:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
     
   </author>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Closures in PHP]]></title>
+    <link href="http://ahimmelstoss.github.io/blog/2014/01/29/closures-in-php/"/>
+    <updated>2014-01-29T19:33:12-05:00</updated>
+    <id>http://ahimmelstoss.github.io/blog/2014/01/29/closures-in-php</id>
+    <content type="html"><![CDATA[<p>Like JavaScript, PHP as well has anonymous functions, also referred to as <code>closures</code> (while related, not the same as closures in functional programming). I first came across anonymous functions in JavaScript, but recently learned about their PHP counterpart while playing around with <a href="http://www.slimframework.com/">Slim</a>, a PHP framework not unlike Sinatra, which I ♥. Closures are an important part of route declarations in Slim:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="c1">//taken from the Slim Documentation:</span>
+</span><span class='line'><span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;/hello/:name&#39;</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$name</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">echo</span> <span class="s2">&quot;Hello, </span><span class="si">$name</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The application that I am building on Slim uses Doctrine ORM. The ORM handles object retrieval through the <code>EntityManager</code> class. Using a call to <code>EntityManager</code>, I can access my objects and then be able to use them within my application.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="c1">// obtaining the entity manager; $conn is my database access and $config is my model configuration</span>
+</span><span class='line'><span class="nv">$entityManager</span> <span class="o">=</span> <span class="nx">EntityManager</span><span class="o">::</span><span class="na">create</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nv">$config</span><span class="p">);</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I still needed a way to pass the instance of <code>EntityManager</code> to my Slim routes. One way, of course, would be to make this instance a <code>global</code> variable. While useful, <code>global</code> variables are not the cleanest way to code. I might not want every function in my application to have access to this variable.</p>
+
+<p>However, closures in PHP can inherit variables from the parent scope in a much more controlled and cleaner way with the <code>use</code> construct. The parent scope of the closure is where the closure is declared, and lucky for me, my code is organized as such that my <code>$entityManager</code> declaration lives in that same scope.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;/topics&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span><span class="p">(</span><span class="nv">$entityManager</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nv">$dql</span> <span class="o">=</span> <span class="s2">&quot;SELECT t, u FROM Topic t JOIN t.user u ORDER BY t.id DESC&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="nv">$query</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="nv">$dql</span><span class="p">);</span>
+</span><span class='line'>  <span class="nv">$topics</span> <span class="o">=</span> <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">getResult</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">//I&#39;m dynamically doing things with my $topics here</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[FULLTEXT in MySQL]]></title>
