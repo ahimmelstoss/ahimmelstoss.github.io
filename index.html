@@ -7,7 +7,7 @@
 
 	<meta name="author" content="amanda himmelstoss">
 
-<meta name="description" content="Like JavaScript, PHP as well has anonymous functions, also referred to as closures (while related, not the same as closures in functional &hellip;"> <meta name="keywords" content="">
+<meta name="description" content="Here in my blog, I&rsquo;ve been chronicling my journey to learn PHP, coming from Ruby as my first programming language. It&rsquo;s been a &hellip;"> <meta name="keywords" content="">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -47,6 +47,284 @@
 </header>
 
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2014/02/04/from-ruby-to-php/">
+			
+				From Ruby to PHP</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-04T13:43:09-05:00" pubdate data-updated="true">Feb 4<span>th</span>, 2014</time></div>
+	</header>
+	<div class="entry-content">
+		<p>Here in my blog, I&rsquo;ve been chronicling my journey to learn PHP, coming from Ruby as my first programming language. It&rsquo;s been a interesting journey so far; while PHP and Ruby share some similarities as scripting languages, the other components and technologies surrounding them are different, at least for me as a beginner in PHP. I wanted to write a blog post about the certain steps I&rsquo;ve made, including outlining the resources I&rsquo;ve found and the stacks I&rsquo;ve been learning in this transition. If you&rsquo;re coming from Ruby to PHP, I hope this post can help you get started.</p>
+
+<p>After I got the building blocks of PHP out of the way, learning the new syntax through various resources (including Codecademy) and books, I took the next step in my learning by re-envisioning a project I worked on during my time at Flatiron called <a href="http://guideme.herokuapp.com/">GuideMe</a>. My choice to take a project I had already done was for a few reasons: The models and their relationships have already been imagined, so I could jump right into learning a new ORM more easily; I also have all of the styling (Bootstrap and otherwise) set up, which would make my project look prettier during the beginning stages of coding it; And, in this case, GuideMe is a relatively uncomplicated concept that would allow me to concentrate on learning the stacks. I think all of this helps for a first major project in another language.</p>
+
+<p>With the help of the incredibly patient and helpful <a href="http://matthewturland.com/">Matthew Turland</a>, whose been a great resource during my journey into PHP, I came up with a strategy on how to tackle this project. First I should note that it is my impression, given my experience (and this could be from my then limited exposure working with the technologies Flatiron focused on), Ruby is relatively contained: to get the job done, there are a few well constructed technologies that basically everyone uses (for example, Bundler, ERB, Rails, or Sinatra). However, in the PHP world, there are many choices of tools to use (different dependency management strategies, many different frameworks, and various templating options).</p>
+
+<p>I decided to work with things I found relatively similar to what I&rsquo;ve been working with in Ruby, simply because these Ruby technologies work well. I&rsquo;m going to go through each part of my stack I&rsquo;m currently working on and discuss what makes them great for Rubyists turned PHPists.</p>
+
+<h3>Composer</h3>
+
+<p>I&rsquo;ll admit I chose <a href="https://getcomposer.org/">Composer</a> because it&rsquo;s what we&rsquo;re currently using at my company. It&rsquo;s relatively new, but the documentation is solid and it&rsquo;s not unlike Bundler for managing your Ruby gems. Installing composer within your project directory creates a <code>composer.json</code> file, where you can require all of your dependencies and files for autoload.</p>
+
+<h3>Doctrine ORM</h3>
+
+<p><a href="http://docs.doctrine-project.org/en/latest/">Doctrine</a> ORM is a DataMapper ORM that I chose to learn because, again, the documentation is pretty straightforward. They have a tutorial that&rsquo;s helpful in walking you through setting up a simple project. With Doctrine, you create entities, or models, that serve to map your objects onto a database. Each model is a class, and within that class, you can map your object&rsquo;s relations to other objects. Below is my model for my Topic object:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">use</span> <span class="nx">Doctrine\Common\Collections\ArrayCollection</span><span class="p">;</span>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * @Entity @Table(name=&quot;topics&quot;)</span>
+</span><span class='line'><span class="sd"> **/</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Topic</span> <span class="p">{</span>
+</span><span class='line'>  <span class="sd">/** @Id @Column(type=&quot;integer&quot;) @GeneratedValue **/</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">   * @Column(type=&quot;string&quot;)</span>
+</span><span class='line'><span class="sd">   * @var string</span>
+</span><span class='line'><span class="sd">   */</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$title</span><span class="p">;</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">   * @Column(type=&quot;string&quot;)</span>
+</span><span class='line'><span class="sd">   * @var string</span>
+</span><span class='line'><span class="sd">   */</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$description</span><span class="p">;</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">   * @ManyToOne(targetEntity=&quot;User&quot;, inversedBy=&quot;topics&quot;)</span>
+</span><span class='line'><span class="sd">   **/</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$user</span><span class="p">;</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">   * @OneToMany(targetEntity=&quot;Suggestion&quot;, mappedBy=&quot;topic&quot;)</span>
+</span><span class='line'><span class="sd">   * @var Suggestion[]</span>
+</span><span class='line'><span class="sd">   **/</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$suggestions</span><span class="p">;</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">   * @ManyToMany(targetEntity=&quot;Tag&quot;, inversedBy=&quot;topics&quot;)</span>
+</span><span class='line'><span class="sd">   * @JoinTable(name=&quot;topics_tags&quot;)</span>
+</span><span class='line'><span class="sd">   **/</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$tags</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">tags</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArrayCollection</span><span class="p">();</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">suggestions</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArrayCollection</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getId</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getTitle</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">title</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">setTitle</span><span class="p">(</span><span class="nv">$title</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">title</span> <span class="o">=</span> <span class="nv">$title</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getDescription</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">description</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">setDescription</span><span class="p">(</span><span class="nv">$description</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">description</span> <span class="o">=</span> <span class="nv">$description</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getUser</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">user</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">setUser</span><span class="p">(</span><span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">user</span> <span class="o">=</span> <span class="nv">$user</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getSuggestions</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">suggestions</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">setSuggestions</span><span class="p">(</span><span class="nv">$suggestions</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">suggestions</span> <span class="o">=</span> <span class="nv">$suggestions</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getTags</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">tags</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">setTags</span><span class="p">(</span><span class="nv">$tags</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">tags</span> <span class="o">=</span> <span class="nv">$tags</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s say I have a page that displays all of the topics. With my above model in place, I can then iterate through <code>$topics</code> (managed by the <code>entityManager</code> class, as outlined <a href="http://docs.doctrine-project.org/en/latest/reference/working-with-objects.html">here</a>) like so:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">foreach</span> <span class="p">(</span><span class="nv">$topics</span> <span class="k">as</span> <span class="nv">$topic</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="nv">$topic</span><span class="o">-&gt;</span><span class="na">getTitle</span><span class="p">()</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="nv">$topic</span><span class="o">-&gt;</span><span class="na">getDescription</span><span class="p">()</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="nv">$topic</span><span class="o">-&gt;</span><span class="na">getUser</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Slim Framework</h3>
+
+<p><a href="http://docs.slimframework.com/">Slim</a> is a lightweight framework inspired by Sinatra. The documentation for it is great, and for those that love Sinatra, it&rsquo;s familiar.</p>
+
+<p>Once Slim is required by Composer (so easy!), within the home directory of your project, set up an <code>index.php</code> file (like <code>app.rb</code> in Sinatra), where you&rsquo;ll keep your routes and instantiate a new Slim object (your app). For sake of clarity, depending on the size of the project, you can keep <code>index.php</code> as the runner file to run your application, and <code>require</code> other route files that you can organize elsewhere (I have a routes directory I keep them all in, and each file corresponds with an object; while called routes, I like to think of them as Controllers).</p>
+
+<p>Here&rsquo;s an example of a route in Slim, taken from the documentation. Not unlike Sinatra at all!</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;/hello/:name&#39;</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$name</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">echo</span> <span class="s2">&quot;Hello, </span><span class="si">$name</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There are also full-stack frameworks within the PHP world. The two most popular ones that have evolved nicely with the language are <a href="http://symfony.com/">Symfony</a> and <a href="http://framework.zend.com/">Zend</a>.</p>
+
+<h3>Templating</h3>
+
+<p>There are many options for templating in PHP. While both <a href="http://twig.sensiolabs.org/">Twig</a> and <a href="http://www.smarty.net/">Smarty</a> are quite popular, I wanted to go with something that didn&rsquo;t require learning another markdown language, but instead uses PHP; essentially I wanted the ERB equivalent. <a href="http://phpsavant.com/docs/">Savant3</a> is incredibly easy to use. The bulk of what it does is pass your object to an instance of the Savant class. Here is my route for displaying one topic by id. I create a new instance of the Savant class, <code>$tpl</code>, pass my already collected instance of Topic (<code>$topic</code>) to it, and then render it through Savant&rsquo;s <code>display()</code> method:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;/topics/:id&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span> <span class="k">use</span><span class="p">(</span><span class="nv">$entityManager</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nv">$topic</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s2">&quot;Topic&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span><span class="nv">$id</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nv">$tpl</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Savant3</span><span class="p">();</span>
+</span><span class='line'>  <span class="nv">$tpl</span><span class="o">-&gt;</span><span class="na">topic</span> <span class="o">=</span> <span class="nv">$topic</span><span class="p">;</span>
+</span><span class='line'>  <span class="nv">$tpl</span><span class="o">-&gt;</span><span class="na">display</span><span class="p">(</span><span class="s1">&#39;views/topics/show.tpl.php&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In my <code>show.tpl.php</code> file, I refer to <code>$tpl-&gt;topic</code> as <code>$this-&gt;topic</code>. Passing the object like this as well passes all of its class functions, like <code>getTitle()</code>, <code>getUser()</code>, etc.</p>
+
+<h3>Conclusion</h3>
+
+<p>PHP has a lot of tools out there for web development; I chose all of these because they embody characteristics of similar tools in Ruby that I love. I&rsquo;m open to any suggestions for other great tools from those who code in both Ruby and PHP! :)</p>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post">
@@ -1100,167 +1378,6 @@
 <p>Before Flatiron, I had thought I wanted to go to graduate school for anthropology, given my love of studying it in undergrad. Part of my desire to go was from a lack of not knowing what I was capable of doing beyond that, as well as sticking with things I&rsquo;m good at, and not taking risks in learning things outside of my comfort zone. At the same time, I&rsquo;ve always loved technology and the internet and thinking about what that all means for our world and society, yet I never thought myself capable of actually building things that would contribute to that. I thought it was magic, and I thought I was only inclined to liberal arts, as a critical thinker, and not a quantitatively capable. I felt like I was taught, implicitly, that studying liberal arts meant I would not be capable of learning a hard skill like programming. Part of that is because these skills are not taught in a traditional academic setting. Part of that as well is attending a women&rsquo;s college and not knowing many people, especially women, in technology.</p>
 
 <p>It&rsquo;s hard for me to articulate the feeling of being so utterly wrong about my capabilities, yet so happy about that at the same time. Finishing week 9 out of 12 of our semester, I feel elated by the fact that I have a skillset that I can objectively speak about with enthusiasm and excitement. Further, I can point to things that I&rsquo;ve made, that can be used by anyone (this week I helped build <a href="http://guideme.herokuapp.com/">GuideMe</a>). I&rsquo;m also consistently inspired to learn more about new topics and to code code code all the time. To enter states of complete flow everyday is invigorating, and to think I can do this for a career is actually magical.</p>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post">
-	<header>
-		<h2 class="title">
-			
-			<a href="/blog/2013/11/17/javascript-vs-ruby/">
-			
-				JavaScript vs. Ruby</a>
-		</h2>
-		<div class="meta date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-11-17T14:49:00-05:00" pubdate data-updated="true">Nov 17<span>th</span>, 2013</time></div>
-	</header>
-	<div class="entry-content">
-		<p>After beginning JavaScript last Thursday, I&rsquo;ve been thinking about the differences between this language and Ruby, whom I&rsquo;ve gotten quite intimate with these last 7 weeks. Coming from Ruby, JavaScript isn&rsquo;t all that different, yet the syntax is unfamiliar and some logic differs slightly.</p>
-
-<p><strong><code>typeof</code> vs <code>class</code></strong></p>
-
-<p>To determine what type of value something is (a number, a fixnum, a string, an Object, an array, etc), in JavaScript you write <code>typeof</code> and then then the object; in Ruby, you append <code>.class</code> to the end of the object.</p>
-
-<p><strong><code>===</code> vs <code>==</code></strong></p>
-
-<p>In JavaScript, the triple equals sign helps determine if two objects are the same exact object (having the same <code>typeof</code> and the same value). For example:
-<code>3 === 3</code> returns <code>true</code>
-In Ruby, that is accomplished through the double equals. (<code>3 == 3</code> returns <code>true</code>)</p>
-
-<p>JavaScript has its own double equals, which shouldn&rsquo;t be confused with Ruby&rsquo;s: double equals in JavaScript only determines if the values match. For example:
-<code>"3" == 3</code> returns <code>true</code></p>
-
-<p><strong><code>parseInt();</code> vs <code>.to_i</code></strong></p>
-
-<p>In JavaScript, to turn a string &ldquo;10&rdquo; into the integer 10, you write <code>parseInt("10");</code>. In Ruby, you write <code>"10".in_i</code>.</p>
-
-<p><strong>Incrementing and Decrementing</strong></p>
-
-<p>To increment or decrement by 1 in JavaScript, you can write <code>++</code> or <code>--</code> (for example, <code>var x = 2; x++;</code> returns <code>3</code>. In Ruby, it&rsquo;s <code>x += 1</code>. You can write this as well in JavaScript (which is useful if you want to increment with numbers other than 1), however, you have the handy <code>++</code> and <code>--</code> as well.</p>
-
-<p><strong>Functions</strong></p>
-
-<p>Functions in JavaScript are the same as methods in Ruby. The syntax of declaring a function vs. declaring a method is slightly different. In Ruby, it&rsquo;s :</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">hello</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;hello&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In JavaScript, the same logic can be written as:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">hello</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>Objects</strong></p>
-
-<p>Objects (similar to Ruby&rsquo;s hash), declared as variables, are a way of organizing key/value pairs. For example, <code>var cat = {color: "grey", name: "Spot", age: "12"};</code>
-To access the value of an associated key, you can call that on the variable name:
-<code>cat.name</code> returns <code>"Spot"</code>. You can also easily delete a key/value pair by writing <code>delete cat.name</code>. To declare a new key/value pair, write: <code>cat.gender = "male";</code>. This appends this new data point to the end of the Object.</p>
-
-<p><strong>Arrays</strong></p>
-
-<p>Both Ruby and JavaScript have Arrays, which are more of less logically the same; however, the Object Array functions (JavaScript) and the Class Array methods (Ruby) have different syntax.
-For example, to find the index of an element in an array, in JavaScript you write <code>arrayName.indexOf("element");</code>. In Ruby, this is accomplished by <code>array_name.index("element")</code></p>
-
-<p><strong><code>each</code></strong></p>
-
-<p>The method <code>each</code> in Ruby is a handy way of iterating through an array of elements in order to change or manipulate them. JavaScript as well as an <code>each</code> function that does the same thing; however, the syntax is slightly different:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">];</span>
-</span><span class='line'><span class="nx">a</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">n</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And in Ruby, the same is written as:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">arr</span> <span class="o">=</span> <span class="o">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="o">]</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">a</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span><span class="o">|</span><span class="n">n</span><span class="o">|</span> <span class="nb">puts</span> <span class="n">n</span><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">#or</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">a</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">n</span><span class="o">|</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="n">n</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><strong>Falsey Values</strong></p>
-
-<p>One big difference between Ruby and JavaScript is the falsey-ness of certain values. Like in Ruby, null (in Ruby, it&rsquo;s nil) and false will return false, however, some truthful values in Ruby will return false in JavaScript, like <code>0</code>, empty strings (<code>""</code>), and <code>undefined</code>.</p>
-
-<p><strong>Object Oriented Programming</strong></p>
-
-<p>JavaScript, like Ruby, can be object-oriented, meaning that objects, their associated methods/functions, can be neatly contained. In JavaScript, a Prototype is much like Ruby&rsquo;s Class. To create a new Prototype in JavaScript:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">Cat</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">age</span><span class="p">,</span> <span class="nx">gender</span><span class="p">){</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">age</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">age</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">gender</span> <span class="o">=</span> <span class="nx">gender</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">meow</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;meow, my name is &quot;</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">name</span><span class="o">+</span><span class="s2">&quot;! I am &quot;</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">age</span><span class="o">+</span><span class="s2">&quot; years old.&quot;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">};</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">maruCat</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Cat</span><span class="p">(</span><span class="s2">&quot;Maru&quot;</span><span class="p">,</span> <span class="s2">&quot;6&quot;</span><span class="p">,</span> <span class="s2">&quot;male&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">maruCat</span><span class="p">.</span><span class="nx">meow</span><span class="p">();</span> <span class="c1">//meow, my name is Maru! I am 6 years old.</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The <code>maruCat</code> object is considered a new instance of the Cat prototype. Prototype is essentially the same as Class in Ruby. Note that <code>this</code> in JavaScript is the same concept as <code>self</code> in Ruby.</p>
 
 		
 		

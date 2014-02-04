@@ -4,13 +4,268 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2014-01-30T11:32:31-05:00</updated>
+  <updated>2014-02-04T15:19:32-05:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
     
   </author>
 
+  
+  <entry>
+    <title type="html"><![CDATA[From Ruby to PHP]]></title>
+    <link href="http://ahimmelstoss.github.io/blog/2014/02/04/from-ruby-to-php/"/>
+    <updated>2014-02-04T13:43:09-05:00</updated>
+    <id>http://ahimmelstoss.github.io/blog/2014/02/04/from-ruby-to-php</id>
+    <content type="html"><![CDATA[<p>Here in my blog, I&rsquo;ve been chronicling my journey to learn PHP, coming from Ruby as my first programming language. It&rsquo;s been a interesting journey so far; while PHP and Ruby share some similarities as scripting languages, the other components and technologies surrounding them are different, at least for me as a beginner in PHP. I wanted to write a blog post about the certain steps I&rsquo;ve made, including outlining the resources I&rsquo;ve found and the stacks I&rsquo;ve been learning in this transition. If you&rsquo;re coming from Ruby to PHP, I hope this post can help you get started.</p>
+
+<p>After I got the building blocks of PHP out of the way, learning the new syntax through various resources (including Codecademy) and books, I took the next step in my learning by re-envisioning a project I worked on during my time at Flatiron called <a href="http://guideme.herokuapp.com/">GuideMe</a>. My choice to take a project I had already done was for a few reasons: The models and their relationships have already been imagined, so I could jump right into learning a new ORM more easily; I also have all of the styling (Bootstrap and otherwise) set up, which would make my project look prettier during the beginning stages of coding it; And, in this case, GuideMe is a relatively uncomplicated concept that would allow me to concentrate on learning the stacks. I think all of this helps for a first major project in another language.</p>
+
+<p>With the help of the incredibly patient and helpful <a href="http://matthewturland.com/">Matthew Turland</a>, whose been a great resource during my journey into PHP, I came up with a strategy on how to tackle this project. First I should note that it is my impression, given my experience (and this could be from my then limited exposure working with the technologies Flatiron focused on), Ruby is relatively contained: to get the job done, there are a few well constructed technologies that basically everyone uses (for example, Bundler, ERB, Rails, or Sinatra). However, in the PHP world, there are many choices of tools to use (different dependency management strategies, many different frameworks, and various templating options).</p>
+
+<p>I decided to work with things I found relatively similar to what I&rsquo;ve been working with in Ruby, simply because these Ruby technologies work well. I&rsquo;m going to go through each part of my stack I&rsquo;m currently working on and discuss what makes them great for Rubyists turned PHPists.</p>
+
+<h3>Composer</h3>
+
+<p>I&rsquo;ll admit I chose <a href="https://getcomposer.org/">Composer</a> because it&rsquo;s what we&rsquo;re currently using at my company. It&rsquo;s relatively new, but the documentation is solid and it&rsquo;s not unlike Bundler for managing your Ruby gems. Installing composer within your project directory creates a <code>composer.json</code> file, where you can require all of your dependencies and files for autoload.</p>
+
+<h3>Doctrine ORM</h3>
+
+<p><a href="http://docs.doctrine-project.org/en/latest/">Doctrine</a> ORM is a DataMapper ORM that I chose to learn because, again, the documentation is pretty straightforward. They have a tutorial that&rsquo;s helpful in walking you through setting up a simple project. With Doctrine, you create entities, or models, that serve to map your objects onto a database. Each model is a class, and within that class, you can map your object&rsquo;s relations to other objects. Below is my model for my Topic object:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">use</span> <span class="nx">Doctrine\Common\Collections\ArrayCollection</span><span class="p">;</span>
+</span><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * @Entity @Table(name=&quot;topics&quot;)</span>
+</span><span class='line'><span class="sd"> **/</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Topic</span> <span class="p">{</span>
+</span><span class='line'>  <span class="sd">/** @Id @Column(type=&quot;integer&quot;) @GeneratedValue **/</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">   * @Column(type=&quot;string&quot;)</span>
+</span><span class='line'><span class="sd">   * @var string</span>
+</span><span class='line'><span class="sd">   */</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$title</span><span class="p">;</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">   * @Column(type=&quot;string&quot;)</span>
+</span><span class='line'><span class="sd">   * @var string</span>
+</span><span class='line'><span class="sd">   */</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$description</span><span class="p">;</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">   * @ManyToOne(targetEntity=&quot;User&quot;, inversedBy=&quot;topics&quot;)</span>
+</span><span class='line'><span class="sd">   **/</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$user</span><span class="p">;</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">   * @OneToMany(targetEntity=&quot;Suggestion&quot;, mappedBy=&quot;topic&quot;)</span>
+</span><span class='line'><span class="sd">   * @var Suggestion[]</span>
+</span><span class='line'><span class="sd">   **/</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$suggestions</span><span class="p">;</span>
+</span><span class='line'>  <span class="sd">/**</span>
+</span><span class='line'><span class="sd">   * @ManyToMany(targetEntity=&quot;Tag&quot;, inversedBy=&quot;topics&quot;)</span>
+</span><span class='line'><span class="sd">   * @JoinTable(name=&quot;topics_tags&quot;)</span>
+</span><span class='line'><span class="sd">   **/</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="nv">$tags</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">tags</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArrayCollection</span><span class="p">();</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">suggestions</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArrayCollection</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getId</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getTitle</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">title</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">setTitle</span><span class="p">(</span><span class="nv">$title</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">title</span> <span class="o">=</span> <span class="nv">$title</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getDescription</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">description</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">setDescription</span><span class="p">(</span><span class="nv">$description</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">description</span> <span class="o">=</span> <span class="nv">$description</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getUser</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">user</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">setUser</span><span class="p">(</span><span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">user</span> <span class="o">=</span> <span class="nv">$user</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getSuggestions</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">suggestions</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">setSuggestions</span><span class="p">(</span><span class="nv">$suggestions</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">suggestions</span> <span class="o">=</span> <span class="nv">$suggestions</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">getTags</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">tags</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">public</span> <span class="k">function</span> <span class="nf">setTags</span><span class="p">(</span><span class="nv">$tags</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">tags</span> <span class="o">=</span> <span class="nv">$tags</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s say I have a page that displays all of the topics. With my above model in place, I can then iterate through <code>$topics</code> (managed by the <code>entityManager</code> class, as outlined <a href="http://docs.doctrine-project.org/en/latest/reference/working-with-objects.html">here</a>) like so:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">foreach</span> <span class="p">(</span><span class="nv">$topics</span> <span class="k">as</span> <span class="nv">$topic</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="nv">$topic</span><span class="o">-&gt;</span><span class="na">getTitle</span><span class="p">()</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="nv">$topic</span><span class="o">-&gt;</span><span class="na">getDescription</span><span class="p">()</span>
+</span><span class='line'>  <span class="k">echo</span> <span class="nv">$topic</span><span class="o">-&gt;</span><span class="na">getUser</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Slim Framework</h3>
+
+<p><a href="http://docs.slimframework.com/">Slim</a> is a lightweight framework inspired by Sinatra. The documentation for it is great, and for those that love Sinatra, it&rsquo;s familiar.</p>
+
+<p>Once Slim is required by Composer (so easy!), within the home directory of your project, set up an <code>index.php</code> file (like <code>app.rb</code> in Sinatra), where you&rsquo;ll keep your routes and instantiate a new Slim object (your app). For sake of clarity, depending on the size of the project, you can keep <code>index.php</code> as the runner file to run your application, and <code>require</code> other route files that you can organize elsewhere (I have a routes directory I keep them all in, and each file corresponds with an object; while called routes, I like to think of them as Controllers).</p>
+
+<p>Here&rsquo;s an example of a route in Slim, taken from the documentation. Not unlike Sinatra at all!</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;/hello/:name&#39;</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$name</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">echo</span> <span class="s2">&quot;Hello, </span><span class="si">$name</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There are also full-stack frameworks within the PHP world. The two most popular ones that have evolved nicely with the language are <a href="http://symfony.com/">Symfony</a> and <a href="http://framework.zend.com/">Zend</a>.</p>
+
+<h3>Templating</h3>
+
+<p>There are many options for templating in PHP. While both <a href="http://twig.sensiolabs.org/">Twig</a> and <a href="http://www.smarty.net/">Smarty</a> are quite popular, I wanted to go with something that didn&rsquo;t require learning another markdown language, but instead uses PHP; essentially I wanted the ERB equivalent. <a href="http://phpsavant.com/docs/">Savant3</a> is incredibly easy to use. The bulk of what it does is pass your object to an instance of the Savant class. Here is my route for displaying one topic by id. I create a new instance of the Savant class, <code>$tpl</code>, pass my already collected instance of Topic (<code>$topic</code>) to it, and then render it through Savant&rsquo;s <code>display()</code> method:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;/topics/:id&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span> <span class="k">use</span><span class="p">(</span><span class="nv">$entityManager</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nv">$topic</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s2">&quot;Topic&quot;</span><span class="p">,</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span><span class="nv">$id</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nv">$tpl</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Savant3</span><span class="p">();</span>
+</span><span class='line'>  <span class="nv">$tpl</span><span class="o">-&gt;</span><span class="na">topic</span> <span class="o">=</span> <span class="nv">$topic</span><span class="p">;</span>
+</span><span class='line'>  <span class="nv">$tpl</span><span class="o">-&gt;</span><span class="na">display</span><span class="p">(</span><span class="s1">&#39;views/topics/show.tpl.php&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In my <code>show.tpl.php</code> file, I refer to <code>$tpl-&gt;topic</code> as <code>$this-&gt;topic</code>. Passing the object like this as well passes all of its class functions, like <code>getTitle()</code>, <code>getUser()</code>, etc.</p>
+
+<h3>Conclusion</h3>
+
+<p>PHP has a lot of tools out there for web development; I chose all of these because they embody characteristics of similar tools in Ruby that I love. I&rsquo;m open to any suggestions for other great tools from those who code in both Ruby and PHP! :)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Closures in PHP]]></title>
