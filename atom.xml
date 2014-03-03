@@ -4,13 +4,150 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2014-02-28T15:30:29-05:00</updated>
+  <updated>2014-03-02T19:47:31-05:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
     
   </author>
 
+  
+  <entry>
+    <title type="html"><![CDATA[CSS to Sass]]></title>
+    <link href="http://ahimmelstoss.github.io/blog/2014/02/28/css-to-sass/"/>
+    <updated>2014-02-28T15:35:44-05:00</updated>
+    <id>http://ahimmelstoss.github.io/blog/2014/02/28/css-to-sass</id>
+    <content type="html"><![CDATA[<p>I recently saw on Twitter someone referring to CSS as a Cascading Shit Show. I can&rsquo;t remember who said it to give credit, but I wish I did, because it&rsquo;s rather accurate.</p>
+
+<p>I&rsquo;m of this persuasion as well because with all of my projects, my approach to CSS seems, to me, to be sloppy and all over the place. I try to keep things organized, but it still seems unruly, or at the very least, <em>very</em> cascading.</p>
+
+<p>I decided to dive into Sass, because it clears up these frustrations with CSS by allowing variables, inheritance (nesting and extending), and mixins. To play around with these features, I decided to refactor the style of a small project, <a href="http://etsy-map-app.herokuapp.com/">My Etsy Map</a>.</p>
+
+<h3>Get the Sass</h3>
+
+<p>First, if you&rsquo;re building a Ruby app without Sass pre-compiling (like Rails), you will need to include the <code>sass</code> gem in your Gemfile. My app here is a Sinatra app, which uses Rack, so not only did I have to include the gem, but in the <code>config.ru</code> file, I needed to include the <code>sass/plugin/rack</code> and use the appropriate Middleware (Sass::Plugin::Rack).</p>
+
+<h3>Some Sass</h3>
+
+<p>To start, I went through and refactored for DRY-ness. I noticed some repeated styles that I could abstract out into <code>variables</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$primary-height: 100%;
+</span><span class='line'>$primary-bg-color: rgba(245, 245, 245, 0.8);</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I decided to got even more fancy and incorporate some <code>mixins</code>, because I had a couple of CSS3 styles that require browser specificity. <code>mixins</code> work like methods that take in parameters. Then you can call them later with <code>include</code>, while providing the appropriate value:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@mixin background-size($size) {
+</span><span class='line'>  -webkit-background-size: $size;
+</span><span class='line'>  -moz-background-size: $size;
+</span><span class='line'>  -o-background-size: $size;
+</span><span class='line'>  background-size: $size;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>@mixin border-radius($radius) {
+</span><span class='line'>  -webkit-border-radius: $radius;
+</span><span class='line'>  -moz-border-radius: $radius;
+</span><span class='line'>  -ms-border-radius: $radius;
+</span><span class='line'>  -o-border-radius: $radius;
+</span><span class='line'>  border-radius: $radius;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>//and later:
+</span><span class='line'>@include background-size(cover);
+</span><span class='line'>
+</span><span class='line'>@include border-radius(5px);</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I also played around with <code>nesting</code>, making use of the <code>&amp;</code> to reference the parent selectors on my a:hover:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.footer {
+</span><span class='line'>  position: absolute;
+</span><span class='line'>  bottom: 0;
+</span><span class='line'>  margin-top: -60px;
+</span><span class='line'>  height: 60px;
+</span><span class='line'>  clear: both;
+</span><span class='line'>  padding-top: 20px;
+</span><span class='line'>  background-color: $primary-bg-color;
+</span><span class='line'>  width: 100%;
+</span><span class='line'>  a {
+</span><span class='line'>  color: #5CB85C;
+</span><span class='line'>  &:hover { color: #3d8b3d; }
+</span><span class='line'>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The CSS output of this assigns the <code>.footer</code> class to the a element and the hover selector styles; this saves me from typing <code>.footer</code> on all of the elements that have that class, as well as keeps it organized.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.footer {
+</span><span class='line'>  position: absolute;
+</span><span class='line'>  bottom: 0;
+</span><span class='line'>  margin-top: -60px;
+</span><span class='line'>  height: 60px;
+</span><span class='line'>  clear: both;
+</span><span class='line'>  padding-top: 20px;
+</span><span class='line'>  background-color: rgba(245, 245, 245, 0.8);
+</span><span class='line'>  width: 100%; }
+</span><span class='line'>  .footer a {
+</span><span class='line'>    color: #5CB85C; }
+</span><span class='line'>    .footer a:hover {
+</span><span class='line'>      color: #3d8b3d; }</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Compiling</h3>
+
+<p>Compiling Sass into CSS is necessary, as the browser only reads CSS. After I wrote my styles in a Sass file (.scss), I had to Sass-ify it by simply running the <code>sass</code> command within the root drectory of my project, where your .scss file is turned into a .css file. The sass command takes [options], like the super useful &mdash;watch, which as you can guess, watches for changes to your .scss and compiles the .css as the changes are made. But if you just want to simply compile, just include the [input] (.scss) and the [output] (.css) files.</p>
+
+<p>Sass is super fun and coming from Ruby, logically familiar to me. I&rsquo;m excited to start incorporating it into all of my projects from now on, as it clears up most of the frustrations with CSS.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[From Ruby to PHP]]></title>

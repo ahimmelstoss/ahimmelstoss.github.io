@@ -1,0 +1,268 @@
+
+<!DOCTYPE HTML>
+<html lang="en-GB">
+<head>
+	<meta charset="utf-8">
+	<title>CSS to Sass  | amanda himmelstoss</title>
+
+	<meta name="author" content="amanda himmelstoss">
+
+<meta name="description" content="I recently saw on Twitter someone referring to CSS as a Cascading Shit Show. I can&rsquo;t remember who said it to give credit, but I wish I did, &hellip;"> <meta name="keywords" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="amanda himmelstoss" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">amanda himmelstoss</a></h1>
+<span class="tagline">building things</span>
+<nav id="main-nav"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</div>
+	</div>
+</nav>
+
+
+</header>
+
+	<div id="content" class="inner"><article class="post">
+	<header>
+		<h2 class="title">CSS to Sass</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-28T15:35:44-05:00" pubdate data-updated="true">Feb 28<span>th</span>, 2014</time></div>
+	</header>
+	<div class="entry-content"><p>I recently saw on Twitter someone referring to CSS as a Cascading Shit Show. I can&rsquo;t remember who said it to give credit, but I wish I did, because it&rsquo;s rather accurate.</p>
+
+<p>I&rsquo;m of this persuasion as well because with all of my projects, my approach to CSS seems, to me, to be sloppy and all over the place. I try to keep things organized, but it still seems unruly, or at the very least, <em>very</em> cascading.</p>
+
+<p>I decided to dive into Sass, because it clears up these frustrations with CSS by allowing variables, inheritance (nesting and extending), and mixins. To play around with these features, I decided to refactor the style of a small project, <a href="http://etsy-map-app.herokuapp.com/">My Etsy Map</a>.</p>
+
+<h3>Get the Sass</h3>
+
+<p>First, if you&rsquo;re building a Ruby app without Sass pre-compiling (like Rails), you will need to include the <code>sass</code> gem in your Gemfile. My app here is a Sinatra app, which uses Rack, so not only did I have to include the gem, but in the <code>config.ru</code> file, I needed to include the <code>sass/plugin/rack</code> and use the appropriate Middleware (Sass::Plugin::Rack).</p>
+
+<h3>Some Sass</h3>
+
+<p>To start, I went through and refactored for DRY-ness. I noticed some repeated styles that I could abstract out into <code>variables</code>:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$primary-height: 100%;
+</span><span class='line'>$primary-bg-color: rgba(245, 245, 245, 0.8);</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I decided to got even more fancy and incorporate some <code>mixins</code>, because I had a couple of CSS3 styles that require browser specificity. <code>mixins</code> work like methods that take in parameters. Then you can call them later with <code>include</code>, while providing the appropriate value:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>@mixin background-size($size) {
+</span><span class='line'>  -webkit-background-size: $size;
+</span><span class='line'>  -moz-background-size: $size;
+</span><span class='line'>  -o-background-size: $size;
+</span><span class='line'>  background-size: $size;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>@mixin border-radius($radius) {
+</span><span class='line'>  -webkit-border-radius: $radius;
+</span><span class='line'>  -moz-border-radius: $radius;
+</span><span class='line'>  -ms-border-radius: $radius;
+</span><span class='line'>  -o-border-radius: $radius;
+</span><span class='line'>  border-radius: $radius;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>//and later:
+</span><span class='line'>@include background-size(cover);
+</span><span class='line'>
+</span><span class='line'>@include border-radius(5px);</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I also played around with <code>nesting</code>, making use of the <code>&amp;</code> to reference the parent selectors on my a:hover:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.footer {
+</span><span class='line'>  position: absolute;
+</span><span class='line'>  bottom: 0;
+</span><span class='line'>  margin-top: -60px;
+</span><span class='line'>  height: 60px;
+</span><span class='line'>  clear: both;
+</span><span class='line'>  padding-top: 20px;
+</span><span class='line'>  background-color: $primary-bg-color;
+</span><span class='line'>  width: 100%;
+</span><span class='line'>  a {
+</span><span class='line'>  color: #5CB85C;
+</span><span class='line'>  &:hover { color: #3d8b3d; }
+</span><span class='line'>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The CSS output of this assigns the <code>.footer</code> class to the a element and the hover selector styles; this saves me from typing <code>.footer</code> on all of the elements that have that class, as well as keeps it organized.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>.footer {
+</span><span class='line'>  position: absolute;
+</span><span class='line'>  bottom: 0;
+</span><span class='line'>  margin-top: -60px;
+</span><span class='line'>  height: 60px;
+</span><span class='line'>  clear: both;
+</span><span class='line'>  padding-top: 20px;
+</span><span class='line'>  background-color: rgba(245, 245, 245, 0.8);
+</span><span class='line'>  width: 100%; }
+</span><span class='line'>  .footer a {
+</span><span class='line'>    color: #5CB85C; }
+</span><span class='line'>    .footer a:hover {
+</span><span class='line'>      color: #3d8b3d; }</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Compiling</h3>
+
+<p>Compiling Sass into CSS is necessary, as the browser only reads CSS. After I wrote my styles in a Sass file (.scss), I had to Sass-ify it by simply running the <code>sass</code> command within the root drectory of my project, where your .scss file is turned into a .css file. The sass command takes [options], like the super useful &mdash;watch, which as you can guess, watches for changes to your .scss and compiles the .css as the changes are made. But if you just want to simply compile, just include the [input] (.scss) and the [output] (.css) files.</p>
+
+<p>Sass is super fun and coming from Ruby, logically familiar to me. I&rsquo;m excited to start incorporating it into all of my projects from now on, as it clears up most of the frustrations with CSS.</p>
+</div>
+	
+		<div class="meta">
+			<span class="comments"><a href="/blog/2014/02/28/css-to-sass/#disqus_thread">Comments</a></span>
+		</div>
+	
+
+</article>
+
+	
+	<div class="share">
+		<ul>
+			<li>
+  <a href="https://twitter.com/intent/tweet?text=CSS to Sass by @ahimmelstoss&url=http://ahimmelstoss.github.io/blog/2014/02/28/css-to-sass/" title="Share CSS to Sass on Twitter">
+    <img src="/images/social/twitter.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://www.facebook.com/sharer.php?u=http://ahimmelstoss.github.io/blog/2014/02/28/css-to-sass/" title="Share CSS to Sass on Facebook">
+    <img src="/images/social/facebook.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://plus.google.com/share?url=http://ahimmelstoss.github.io/blog/2014/02/28/css-to-sass/" title="Share CSS to Sass on Google Plus">
+    <img src="/images/social/google.png" />
+  </a>
+</li>
+
+		</ul>
+	</div>
+
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">&copy; 2014
+
+    amanda himmelstoss
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/hyphenator.js"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'ahimmelstoss';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ahimmelstoss.github.io/blog/2014/02/28/css-to-sass/';
+        var disqus_url = 'http://ahimmelstoss.github.io/blog/2014/02/28/css-to-sass/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+</body>
+</html>
