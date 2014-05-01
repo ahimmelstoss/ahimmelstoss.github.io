@@ -4,13 +4,199 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2014-04-30T22:35:49-04:00</updated>
+  <updated>2014-05-01T12:15:52-04:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
     
   </author>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Refactoring in Ruby]]></title>
+    <link href="http://ahimmelstoss.github.io/blog/2014/05/01/refactoring-in-ruby/"/>
+    <updated>2014-05-01T11:59:18-04:00</updated>
+    <id>http://ahimmelstoss.github.io/blog/2014/05/01/refactoring-in-ruby</id>
+    <content type="html"><![CDATA[<p>Lately I&rsquo;ve been giving a lot of thought into not just making something work, but making it cleaner. I&rsquo;ve been reading Sandi Metz&rsquo;s <a href="http://www.poodr.com/">Practical Object Oriented Design in Ruby</a>, which although not explicitly about refactoring, seems to have gotten me in the frame of mind to think about it. Part of me thinks this marks a shift for me from level beginner to intermediate, but actually no, because I always want to be a beginner, and also, I&rsquo;m actually still really a beginner. :)</p>
+
+<p>When thinking about effective teaching at Flatiron (side note: I&rsquo;m back! It&rsquo;s awesome), we believe in the idea of &ldquo;Make it work. Make it right. Make it fast&rdquo;, a concept coined by Kent Beck back in the day. An effective learning process almost demands this concept: get it working so you can learn how it works, and for the sake of accomplishment. I believe this is paramount to being a junior developer. Before you learn how to be good, you need to just learn how to do it. The good part will come with time, practice, and studying eloquent code (see: POODR).</p>
+
+<p>I&rsquo;ve been doing just that, and have been thinking about giving more time to refactoring and taking pride in making my code the best it can be (and like everything, it can always be better).</p>
+
+<p>I&rsquo;ve been working on a simple side project that makes calls to the Github API. I&rsquo;ve been using the <a href="https://github.com/typhoeus/typhoeus">Typhoeus gem</a> for making the requests (it&rsquo;s a great gem to learn to use, for its versatility). Before refactoring, I had a bunch of methods within a class (or model, as it&rsquo;s a Rails app) that each work as an API call for something specific (to get an organization, repo, etc).</p>
+
+<p>Here&rsquo;s what it looked like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">GithubConnection</span>
+</span><span class='line'>  <span class="kp">attr_reader</span> <span class="ss">:username</span><span class="p">,</span> <span class="ss">:token</span><span class="p">,</span> <span class="ss">:orgs</span><span class="p">,</span> <span class="ss">:repos</span><span class="p">,</span> <span class="ss">:issues</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">github_data</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@username</span> <span class="o">=</span> <span class="n">github_data</span><span class="o">[</span><span class="s2">&quot;username&quot;</span><span class="o">]</span>
+</span><span class='line'>    <span class="vi">@token</span> <span class="o">=</span> <span class="n">github_data</span><span class="o">[</span><span class="s2">&quot;token&quot;</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">get_organizations</span>
+</span><span class='line'>    <span class="n">request</span> <span class="o">=</span> <span class="ss">Typhoeus</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+</span><span class='line'>      <span class="s2">&quot;https://api.github.com/user/orgs&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">headers</span><span class="p">:</span> <span class="p">{</span><span class="ss">Authorization</span><span class="p">:</span> <span class="s2">&quot;token </span><span class="si">#{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+</span><span class='line'>    <span class="p">)</span>
+</span><span class='line'>    <span class="n">response</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>    <span class="n">orgs</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">org</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">org</span><span class="o">[</span><span class="s2">&quot;login&quot;</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">get_repos</span><span class="p">(</span><span class="n">organization</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">request</span> <span class="o">=</span> <span class="ss">Typhoeus</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+</span><span class='line'>      <span class="s2">&quot;https://api.github.com/orgs/</span><span class="si">#{</span><span class="n">organization</span><span class="si">}</span><span class="s2">/repos&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">headers</span><span class="p">:</span> <span class="p">{</span><span class="ss">Authorization</span><span class="p">:</span> <span class="s2">&quot;token </span><span class="si">#{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+</span><span class='line'>      <span class="p">)</span>
+</span><span class='line'>    <span class="n">response</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>    <span class="n">repos</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">repo</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">repo</span><span class="o">[</span><span class="s2">&quot;name&quot;</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">get_issues</span><span class="p">(</span><span class="n">organization</span><span class="p">,</span> <span class="n">repo</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">request</span> <span class="o">=</span> <span class="ss">Typhoeus</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+</span><span class='line'>      <span class="s2">&quot;https://api.github.com/</span><span class="si">#{</span><span class="n">organization</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="n">repo</span><span class="si">}</span><span class="s2">/issues&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">headers</span><span class="p">:</span> <span class="p">{</span><span class="ss">Authorization</span><span class="p">:</span> <span class="s2">&quot;token </span><span class="si">#{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+</span><span class='line'>      <span class="p">)</span>
+</span><span class='line'>    <span class="n">response</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>    <span class="n">repos</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">issue</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">issue</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Each method (<code>get_organizations</code>, <code>get_repos</code>, and <code>get_issues</code>) has a specific purpose (which is great! A method should be a single unit of work). But something smells, even just a little bit. I&rsquo;ve been repeating myself, with my <code>request = Typhoeus::Request.new...</code> and handling the responses via parsing. This breaks the number one rule of clean code: <strong>DRY</strong>. Don&rsquo;t Repeat Yourself. Whoops. It&rsquo;s okay, because these methods get the job done. But I can do a little better.</p>
+
+<p>I began to think about how to fix this. What are the units of functionality that are repeated? What are they doing? And, what are the unique portions of those repeated parts (as in, <em>why</em> was I repeating myself)? How can I abstract out the repetition, and account for the unique parts?</p>
+
+<p>Generally, each method makes an API call. The unique part is what the call is calling to. Each method is taking the response of that call and iterating through to get the data that I want. The unique part of that looping is simply what is being iterated over. I can rewrite the above into a single method that given unique data within its parameters, handles this. Note that I need to pass in an optional <code>key</code>; remember above that when iterating through the JSON object, some of the data I&rsquo;m extracting is the value in a key:value pair.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">request</span> <span class="o">=</span> <span class="ss">Typhoeus</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="ss">headers</span><span class="p">:</span> <span class="p">{</span><span class="ss">Authorization</span><span class="p">:</span> <span class="s2">&quot;token </span><span class="si">#{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+</span><span class='line'>    <span class="n">response</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>    <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">to_parse</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">key</span> <span class="p">?</span> <span class="n">to_parse</span><span class="o">[</span><span class="n">key</span><span class="o">]</span> <span class="p">:</span> <span class="n">to_parse</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This method encapsulates two units of work. This breaks the rule of <strong>separation of concerns</strong>. If we follow that rule, a method should really only be responsible for one unit of functionality.</p>
+
+<p>With that, it&rsquo;s a bit clearer how I could further refactor. I can make two methods that are each a unit of functionality that take in some unique information and use that information to return different values. First, I&rsquo;ll make a method that is a scaffold for <em>some</em> API call, given what I want to call to (which is passed in as parameters).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">make_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">request</span> <span class="o">=</span> <span class="ss">Typhoeus</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">response</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then I&rsquo;ll have a separate method that handles the response of that call (it calls the <code>make_request</code> method within it), parsing it and returning the data I want, given the API url provided.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">json_parse</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>    <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">make_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="ss">headers</span><span class="p">:</span> <span class="p">{</span><span class="ss">Authorization</span><span class="p">:</span> <span class="s2">&quot;token </span><span class="si">#{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">to_parse</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">key</span> <span class="p">?</span> <span class="n">to_parse</span><span class="o">[</span><span class="n">key</span><span class="o">]</span> <span class="p">:</span> <span class="n">to_parse</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>For the sake of my application structure, I&rsquo;d like to have methods for each of those individual API calls, so I can call them on instances of the class within the controller (this is primarily for clarity on the controller end; <code>@instance.get_organizations</code> is easily understood at first glance).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">get_organizations</span>
+</span><span class='line'>    <span class="n">orgs</span> <span class="o">=</span> <span class="n">json_parse</span><span class="p">(</span><span class="s2">&quot;https://api.github.com/user/orgs&quot;</span><span class="p">,</span> <span class="s2">&quot;login&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">get_repos</span><span class="p">(</span><span class="n">organization</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">repos</span> <span class="o">=</span> <span class="n">json_parse</span><span class="p">(</span><span class="s2">&quot;https://api.github.com/orgs/</span><span class="si">#{</span><span class="n">organization</span><span class="si">}</span><span class="s2">/repos&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">get_issues</span><span class="p">(</span><span class="n">organization</span><span class="p">,</span> <span class="n">repo</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">issues</span> <span class="o">=</span> <span class="n">json_parse</span><span class="p">(</span><span class="s2">&quot;https://api.github.com/repos/</span><span class="si">#{</span><span class="n">organization</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="n">repo</span><span class="si">}</span><span class="s2">/issues&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I could take it farther than this and refactor even more, but this is clear, concise, and has just enough syntactic sugar without being unreadable at first glance to fellow developers. The best refactoring should do this without sacrificing readability.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Getting Sassy]]></title>
