@@ -195,6 +195,215 @@
 	<header>
 		<h2 class="title">
 			
+			<a href="/blog/2014/05/01/refactoring-in-ruby/">
+			
+				Refactoring in Ruby</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-05-01T11:59:18-04:00" pubdate data-updated="true">May 1<span>st</span>, 2014</time></div>
+	</header>
+	<div class="entry-content">
+		<p>Lately I&rsquo;ve been giving a lot of thought into not just making something work, but making it cleaner. I&rsquo;ve been reading Sandi Metz&rsquo;s <a href="http://www.poodr.com/">Practical Object Oriented Design in Ruby</a>, which although not explicitly about refactoring, seems to have gotten me in the frame of mind to think about it. Part of me thinks this marks a shift for me from level beginner to intermediate, but actually no, because I always want to be a beginner, and also, I&rsquo;m actually still really a beginner. :)</p>
+
+<p>When thinking about effective teaching at Flatiron (side note: I&rsquo;m back! It&rsquo;s awesome), we believe in the idea of &ldquo;Make it work. Make it right. Make it fast&rdquo;, a concept coined by Kent Beck back in the day. An effective learning process almost demands this concept: get it working so you can learn how it works, and for the sake of accomplishment. I believe this is paramount to being a junior developer. Before you learn how to be good, you need to just learn how to do it. The good part will come with time, practice, and studying eloquent code (see: POODR).</p>
+
+<p>I&rsquo;ve been doing just that, and have been thinking about giving more time to refactoring and taking pride in making my code the best it can be (and like everything, it can always be better).</p>
+
+<p>I&rsquo;ve been working on a simple side project that makes calls to the Github API. I&rsquo;ve been using the <a href="https://github.com/typhoeus/typhoeus">Typhoeus gem</a> for making the requests (it&rsquo;s a great gem to learn to use, for its versatility). Before refactoring, I had a bunch of methods within a class (or model, as it&rsquo;s a Rails app) that each work as an API call for something specific (to get an organization, repo, etc).</p>
+
+<p>Here&rsquo;s what it looked like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">GithubConnection</span>
+</span><span class='line'>  <span class="kp">attr_reader</span> <span class="ss">:username</span><span class="p">,</span> <span class="ss">:token</span><span class="p">,</span> <span class="ss">:orgs</span><span class="p">,</span> <span class="ss">:repos</span><span class="p">,</span> <span class="ss">:issues</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">github_data</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@username</span> <span class="o">=</span> <span class="n">github_data</span><span class="o">[</span><span class="s2">&quot;username&quot;</span><span class="o">]</span>
+</span><span class='line'>    <span class="vi">@token</span> <span class="o">=</span> <span class="n">github_data</span><span class="o">[</span><span class="s2">&quot;token&quot;</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">get_organizations</span>
+</span><span class='line'>    <span class="n">request</span> <span class="o">=</span> <span class="ss">Typhoeus</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+</span><span class='line'>      <span class="s2">&quot;https://api.github.com/user/orgs&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">headers</span><span class="p">:</span> <span class="p">{</span><span class="ss">Authorization</span><span class="p">:</span> <span class="s2">&quot;token </span><span class="si">#{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+</span><span class='line'>    <span class="p">)</span>
+</span><span class='line'>    <span class="n">response</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>    <span class="n">orgs</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">org</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">org</span><span class="o">[</span><span class="s2">&quot;login&quot;</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">get_repos</span><span class="p">(</span><span class="n">organization</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">request</span> <span class="o">=</span> <span class="ss">Typhoeus</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+</span><span class='line'>      <span class="s2">&quot;https://api.github.com/orgs/</span><span class="si">#{</span><span class="n">organization</span><span class="si">}</span><span class="s2">/repos&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">headers</span><span class="p">:</span> <span class="p">{</span><span class="ss">Authorization</span><span class="p">:</span> <span class="s2">&quot;token </span><span class="si">#{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+</span><span class='line'>      <span class="p">)</span>
+</span><span class='line'>    <span class="n">response</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>    <span class="n">repos</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">repo</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">repo</span><span class="o">[</span><span class="s2">&quot;name&quot;</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">get_issues</span><span class="p">(</span><span class="n">organization</span><span class="p">,</span> <span class="n">repo</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">request</span> <span class="o">=</span> <span class="ss">Typhoeus</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+</span><span class='line'>      <span class="s2">&quot;https://api.github.com/</span><span class="si">#{</span><span class="n">organization</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="n">repo</span><span class="si">}</span><span class="s2">/issues&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="ss">headers</span><span class="p">:</span> <span class="p">{</span><span class="ss">Authorization</span><span class="p">:</span> <span class="s2">&quot;token </span><span class="si">#{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+</span><span class='line'>      <span class="p">)</span>
+</span><span class='line'>    <span class="n">response</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>    <span class="n">repos</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">issue</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">issue</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Each method (<code>get_organizations</code>, <code>get_repos</code>, and <code>get_issues</code>) has a specific purpose (which is great! A method should be a single unit of work). But something smells, even just a little bit. I&rsquo;ve been repeating myself, with my <code>request = Typhoeus::Request.new...</code> and handling the responses via parsing. This breaks the number one rule of clean code: <strong>DRY</strong>. Don&rsquo;t Repeat Yourself. Whoops. It&rsquo;s okay, because these methods get the job done. But I can do a little better.</p>
+
+<p>I began to think about how to fix this. What are the units of functionality that are repeated? What are they doing? And, what are the unique portions of those repeated parts (as in, <em>why</em> was I repeating myself)? How can I abstract out the repetition, and account for the unique parts?</p>
+
+<p>Generally, each method makes an API call. The unique part is what the call is calling to. Each method is taking the response of that call and iterating through to get the data that I want. The unique part of that looping is simply what is being iterated over. I can rewrite the above into a single method that given unique data within its parameters, handles this. Note that I need to pass in an optional <code>key</code>; remember above that when iterating through the JSON object, some of the data I&rsquo;m extracting is the value in a key:value pair.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">request</span> <span class="o">=</span> <span class="ss">Typhoeus</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="ss">headers</span><span class="p">:</span> <span class="p">{</span><span class="ss">Authorization</span><span class="p">:</span> <span class="s2">&quot;token </span><span class="si">#{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span>
+</span><span class='line'>    <span class="n">response</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>    <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">to_parse</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">key</span> <span class="p">?</span> <span class="n">to_parse</span><span class="o">[</span><span class="n">key</span><span class="o">]</span> <span class="p">:</span> <span class="n">to_parse</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This method encapsulates two units of work. This breaks the rule of <strong>separation of concerns</strong>. If we follow that rule, a method should really only be responsible for one unit of functionality.</p>
+
+<p>With that, it&rsquo;s a bit clearer how I could further refactor. I can make two methods that are each a unit of functionality that take in some unique information and use that information to return different values. First, I&rsquo;ll make a method that is a scaffold for <em>some</em> API call, given what I want to call to (which is passed in as parameters).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">make_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">request</span> <span class="o">=</span> <span class="ss">Typhoeus</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">response</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then I&rsquo;ll have a separate method that handles the response of that call (it calls the <code>make_request</code> method within it), parsing it and returning the data I want, given the API url provided.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">json_parse</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>    <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">make_request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="ss">headers</span><span class="p">:</span> <span class="p">{</span><span class="ss">Authorization</span><span class="p">:</span> <span class="s2">&quot;token </span><span class="si">#{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">body</span><span class="p">)</span><span class="o">.</span><span class="n">map</span> <span class="k">do</span> <span class="o">|</span><span class="n">to_parse</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">key</span> <span class="p">?</span> <span class="n">to_parse</span><span class="o">[</span><span class="n">key</span><span class="o">]</span> <span class="p">:</span> <span class="n">to_parse</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>For the sake of my application structure, I&rsquo;d like to have methods for each of those individual API calls, so I can call them on instances of the class within the controller (this is primarily for clarity on the controller end; <code>@instance.get_organizations</code> is easily understood at first glance).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">get_organizations</span>
+</span><span class='line'>    <span class="n">orgs</span> <span class="o">=</span> <span class="n">json_parse</span><span class="p">(</span><span class="s2">&quot;https://api.github.com/user/orgs&quot;</span><span class="p">,</span> <span class="s2">&quot;login&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">get_repos</span><span class="p">(</span><span class="n">organization</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">repos</span> <span class="o">=</span> <span class="n">json_parse</span><span class="p">(</span><span class="s2">&quot;https://api.github.com/orgs/</span><span class="si">#{</span><span class="n">organization</span><span class="si">}</span><span class="s2">/repos&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">get_issues</span><span class="p">(</span><span class="n">organization</span><span class="p">,</span> <span class="n">repo</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">issues</span> <span class="o">=</span> <span class="n">json_parse</span><span class="p">(</span><span class="s2">&quot;https://api.github.com/repos/</span><span class="si">#{</span><span class="n">organization</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="n">repo</span><span class="si">}</span><span class="s2">/issues&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I could take it farther than this and refactor even more, but this is clear, concise, and has just enough syntactic sugar without being unreadable at first glance to fellow developers. The best refactoring should do this without sacrificing readability.</p>
+
+		
+		
+	</div>
+
+</article>
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
 			<a href="/blog/2014/02/28/css-to-sass/">
 			
 				Getting Sassy</a>
@@ -1110,343 +1319,6 @@
 <p>One cool thing about PHP is the <code>$_GET</code> variable; this is called a <code>superglobal</code> array. There is also <code>$_POST</code>, <code>$_REQUEST</code>, <code>$_SERVER</code>, <code>$_ENV</code>, <code>$_SESSION</code>, and <code>$_COOKIE</code>. These superglobal arrays are very similar to <code>params[]</code> found in Ruby on Rails and Sinatra. These arrays are where PHP stores values sent into a script from an HTML from the GET, POST, etc methods. Whereas <code>params[]</code> can hold data from any type of action, the differentiation between get, post, etc gives some added security.</p>
 
 <p>If you want to play with my Roman Numerals Converter, it&rsquo;s <a href="http://www.amandahimmelstoss.com/romanconverter.php">here</a>!</p>
-
-		
-		
-	</div>
-
-</article>
-
-
-    <article class="post">
-	<header>
-		<h2 class="title">
-			
-			<a href="/blog/2013/12/23/arrays-in-php/">
-			
-				Arrays in PHP</a>
-		</h2>
-		<div class="meta date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-12-23T18:42:00-05:00" pubdate data-updated="true">Dec 23<span>rd</span>, 2013</time></div>
-	</header>
-	<div class="entry-content">
-		<p>In Ruby, arrays and hashes are two separate types of data structures. Arrays have elements with corresponding indexes, whereas hashes you can set you own key => value pairs. In PHP, arrays and hashes exist, but are not so mutually exclusive. There are two types of arrays, <code>indexed</code> and <code>associative</code>. Indexed arrays, much like their name suggests, are much like Ruby&rsquo;s arrays, and associative arrays operate much like hashes.</p>
-
-<p>What&rsquo;s interesting about the value of an indexed array is that it resembles that of an associative array: the keys are automatically assigned for you as an index for the values.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span class='line'><span class="c1">//an indexed array of cat breeds</span>
-</span><span class='line'><span class="nv">$myArray</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;siamese&quot;</span><span class="p">,</span> <span class="s2">&quot;scottish fold&quot;</span><span class="p">,</span> <span class="s2">&quot;calico&quot;</span><span class="p">,</span> <span class="s2">&quot;ragdoll&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="cm">/* → array(</span>
-</span><span class='line'><span class="cm">  0 =&gt; &#39;siamese&#39;,</span>
-</span><span class='line'><span class="cm">  1 =&gt; &#39;scottish fold&#39;,</span>
-</span><span class='line'><span class="cm">  2 =&gt; &#39;calico&#39;,</span>
-</span><span class='line'><span class="cm">  3 =&gt; &#39;ragdoll&#39;</span>
-</span><span class='line'><span class="cm">) */</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">//an associative array of one cat</span>
-</span><span class='line'><span class="nv">$maruCat</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;name&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;Maru&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span> <span class="o">=&gt;</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;breed&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;scottish fold&quot;</span><span class="p">,</span> <span class="s2">&quot;country&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;Japanese&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="cm">/*  → array(</span>
-</span><span class='line'><span class="cm">  &#39;name&#39; =&gt; &#39;Maru&#39;,</span>
-</span><span class='line'><span class="cm">  &#39;age&#39; =&gt; 6,</span>
-</span><span class='line'><span class="cm">  &#39;breed&#39; =&gt; &#39;scottish fold&#39;,</span>
-</span><span class='line'><span class="cm">  &#39;country&#39; =&gt; &#39;Japanese&#39;</span>
-</span><span class='line'><span class="cm">) */</span>
-</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Arrays in PHP can also be nested. Below, I&rsquo;ve taken an exercise we did during the first few weeks at Flatiron that gives a nested array of data about some pigeons (<code>$rawPigeonData</code>) and transforms the structure of it into a more organized list with each pigeon&rsquo;s name being the key in the associative array.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span class='line'><span class="nv">$rawPigeonData</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
-</span><span class='line'>  <span class="s2">&quot;color&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
-</span><span class='line'>    <span class="s2">&quot;purple&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Theo&quot;</span><span class="p">,</span> <span class="s2">&quot;Peter Jr.&quot;</span><span class="p">,</span> <span class="s2">&quot;Lucky&quot;</span><span class="p">),</span>
-</span><span class='line'>    <span class="s2">&quot;grey&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Theo&quot;</span><span class="p">,</span> <span class="s2">&quot;Peter Jr.&quot;</span><span class="p">,</span> <span class="s2">&quot;Ms .K&quot;</span><span class="p">),</span>
-</span><span class='line'>    <span class="s2">&quot;white&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Queenie&quot;</span><span class="p">,</span> <span class="s2">&quot;Andrew&quot;</span><span class="p">,</span> <span class="s2">&quot;Ms .K&quot;</span><span class="p">,</span> <span class="s2">&quot;Alex&quot;</span><span class="p">),</span>
-</span><span class='line'>    <span class="s2">&quot;brown&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Queenie&quot;</span><span class="p">,</span> <span class="s2">&quot;Alex&quot;</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">),</span>
-</span><span class='line'>  <span class="s2">&quot;gender&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
-</span><span class='line'>    <span class="s2">&quot;male&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Alex&quot;</span><span class="p">,</span> <span class="s2">&quot;Theo&quot;</span><span class="p">,</span> <span class="s2">&quot;Peter Jr.&quot;</span><span class="p">,</span> <span class="s2">&quot;Andrew&quot;</span><span class="p">,</span> <span class="s2">&quot;Lucky&quot;</span><span class="p">),</span>
-</span><span class='line'>    <span class="s2">&quot;female&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Queenie&quot;</span><span class="p">,</span> <span class="s2">&quot;Ms .K&quot;</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">),</span>
-</span><span class='line'>  <span class="s2">&quot;lives&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
-</span><span class='line'>    <span class="s2">&quot;Subway&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Theo&quot;</span><span class="p">,</span> <span class="s2">&quot;Queenie&quot;</span><span class="p">),</span>
-</span><span class='line'>    <span class="s2">&quot;Central Park&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Alex&quot;</span><span class="p">,</span> <span class="s2">&quot;Ms .K&quot;</span><span class="p">,</span> <span class="s2">&quot;Lucky&quot;</span><span class="p">),</span>
-</span><span class='line'>    <span class="s2">&quot;Library&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Peter Jr.&quot;</span><span class="p">),</span>
-</span><span class='line'>    <span class="s2">&quot;City Hall&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;Andrew&quot;</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">)</span>
-</span><span class='line'><span class="p">);</span>
-</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><code>$pigeonList</code> is the new associative array I&rsquo;m going to create by iterating through <code>$rawPigeonData</code>:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-<span class='line-number'>88</span>
-<span class='line-number'>89</span>
-<span class='line-number'>90</span>
-<span class='line-number'>91</span>
-<span class='line-number'>92</span>
-<span class='line-number'>93</span>
-<span class='line-number'>94</span>
-<span class='line-number'>95</span>
-<span class='line-number'>96</span>
-<span class='line-number'>97</span>
-<span class='line-number'>98</span>
-<span class='line-number'>99</span>
-<span class='line-number'>100</span>
-<span class='line-number'>101</span>
-<span class='line-number'>102</span>
-<span class='line-number'>103</span>
-<span class='line-number'>104</span>
-<span class='line-number'>105</span>
-<span class='line-number'>106</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span class='line'><span class="nv">$pigeonList</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">foreach</span> <span class="p">(</span><span class="nv">$rawPigeonData</span> <span class="k">as</span> <span class="nv">$property</span> <span class="o">=&gt;</span> <span class="nv">$valueArray</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">foreach</span> <span class="p">(</span><span class="nv">$valueArray</span> <span class="k">as</span> <span class="nv">$value</span> <span class="o">=&gt;</span> <span class="nv">$pigeonNames</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$pigeonNames</span> <span class="k">as</span> <span class="nv">$name</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$pigeonList</span><span class="p">[</span><span class="nv">$name</span><span class="p">]))</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$pigeonList</span><span class="p">[</span><span class="nv">$name</span><span class="p">][</span><span class="nv">$property</span><span class="p">]))</span> <span class="p">{</span>
-</span><span class='line'>          <span class="nb">array_push</span><span class="p">(</span><span class="nv">$pigeonList</span><span class="p">[</span><span class="nv">$name</span><span class="p">][</span><span class="nv">$property</span><span class="p">],</span> <span class="nv">$value</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>          <span class="nv">$pigeonList</span><span class="p">[</span><span class="nv">$name</span><span class="p">][</span><span class="nv">$property</span><span class="p">]</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$pigeonList</span><span class="p">[</span><span class="nv">$name</span><span class="p">]</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="nv">$property</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="nv">$value</span><span class="p">));</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/* The array looks like this once it&#39;s structured:</span>
-</span><span class='line'><span class="cm"> → array(</span>
-</span><span class='line'><span class="cm">  &#39;Theo&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;purple&#39;,</span>
-</span><span class='line'><span class="cm">      1 =&gt; &#39;grey&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;male&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;Subway&#39;</span>
-</span><span class='line'><span class="cm">    )</span>
-</span><span class='line'><span class="cm">  ),</span>
-</span><span class='line'><span class="cm">  &#39;Peter Jr.&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;purple&#39;,</span>
-</span><span class='line'><span class="cm">      1 =&gt; &#39;grey&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;male&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;Library&#39;</span>
-</span><span class='line'><span class="cm">    )</span>
-</span><span class='line'><span class="cm">  ),</span>
-</span><span class='line'><span class="cm">  &#39;Lucky&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;purple&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;male&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;Central Park&#39;</span>
-</span><span class='line'><span class="cm">    )</span>
-</span><span class='line'><span class="cm">  ),</span>
-</span><span class='line'><span class="cm">  &#39;Ms .K&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;grey&#39;,</span>
-</span><span class='line'><span class="cm">      1 =&gt; &#39;white&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;female&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;Central Park&#39;</span>
-</span><span class='line'><span class="cm">    )</span>
-</span><span class='line'><span class="cm">  ),</span>
-</span><span class='line'><span class="cm">  &#39;Queenie&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;white&#39;,</span>
-</span><span class='line'><span class="cm">      1 =&gt; &#39;brown&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;female&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;Subway&#39;</span>
-</span><span class='line'><span class="cm">    )</span>
-</span><span class='line'><span class="cm">  ),</span>
-</span><span class='line'><span class="cm">  &#39;Andrew&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;white&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;male&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;City Hall&#39;</span>
-</span><span class='line'><span class="cm">    )</span>
-</span><span class='line'><span class="cm">  ),</span>
-</span><span class='line'><span class="cm">  &#39;Alex&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">    &#39;color&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;white&#39;,</span>
-</span><span class='line'><span class="cm">      1 =&gt; &#39;brown&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;gender&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;male&#39;</span>
-</span><span class='line'><span class="cm">    ),</span>
-</span><span class='line'><span class="cm">    &#39;lives&#39; =&gt; array(</span>
-</span><span class='line'><span class="cm">      0 =&gt; &#39;Central Park&#39;</span>
-</span><span class='line'><span class="cm">    )</span>
-</span><span class='line'><span class="cm">  )</span>
-</span><span class='line'><span class="cm">)</span>
-</span><span class='line'><span class="cm">*/</span>
-</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
-</span></code></pre></td></tr></table></div></figure>
-
 
 		
 		
