@@ -7,7 +7,7 @@
 
 	<meta name="author" content="amanda himmelstoss">
 
-<meta name="description" content="When I first embarked on creating an API for a project, I couldn&rsquo;t find a ton of resources on how to test it with RSpec, so I decided to write &hellip;"> <meta name="keywords" content="">
+<meta name="description" content="When I first embarked on creating an API for a project, I couldn’t find a ton of resources on how to test it with RSpec, so I decided to write a &hellip;"> <meta name="keywords" content="">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -55,7 +55,7 @@
 			
 			<a href="/blog/2014/07/27/testing-a-rails-api-with-rspec/">
 			
-				Testing a Rails API With RSpec</a>
+				Testing Rails jBuilder JSON APIs With RSpec</a>
 		</h2>
 		<div class="meta date">
 
@@ -72,13 +72,17 @@
 <time datetime="2014-07-27T21:17:08-04:00" pubdate data-updated="true">Jul 27<span>th</span>, 2014</time></div>
 	</header>
 	<div class="entry-content">
-		<p>When I first embarked on creating an API for a project, I couldn&rsquo;t find a ton of resources on how to test it with RSpec, so I decided to write a blog post about it.</p>
+		<p>When I first embarked on creating an API for a project, I couldn’t find a ton of resources on how to test it with RSpec, so I decided to write a blog post about it.</p>
 
-<p>Let&rsquo;s say we&rsquo;re building an app that allows users to list their second bedrooms to short-term guests. We all love Airbnb :)</p>
+<p>Let’s say we’re building an app that allows users to list their second bedrooms to short-term guests. We all love Airbnb :)</p>
 
-<p>This would be an application with many models that have complex associations, but let&rsquo;s focus on what a host can do with their listing(s). They can create a new one, edit it, and delete it. A user can view one listing, or many listings (given certain filters like price, listing type, availability, city, etc). Let&rsquo;s focus on the <code>GET /listings</code>, <code>POST /listings</code>, and <code>DELETE /listings/:id</code> requests that our API would support.</p>
+<p>This would be an application with many models that have complex associations, but let’s focus on what a host can do with their listing(s). They can create a new one, edit it, and delete it. A user can view one listing, or many listings (given certain filters like price, listing type, availability, city, etc). Let’s focus on the <code>GET /listings</code>, <code>POST /listings</code>, and <code>DELETE /listings/:id</code> requests that our API would support.</p>
 
-<p>The listings controller would look something like this:</p>
+<p>Here&rsquo;s the <a href="https://gist.github.com/ahimmelstoss/05618329e1d86aee383b">listings controller</a>. This controller ultimately inherits from <code>ActionController::Base</code>, and I’m using <a href="https://gist.github.com/ahimmelstoss/3ad4726cec98fbd4c3c1">jbuilder</a> to format the rendered JSON. Pretty straightforward.</p>
+
+<h2>The Tests</h2>
+
+<p>The first thing we need to do is tell each test to <code>render_views</code>. As we’re rendering JSON via jbuilder, and these are handled by Rails as views. This should go at the top before any tests.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -86,108 +90,23 @@
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">ListingsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
-</span><span class='line'>  <span class="n">before_action</span> <span class="ss">:set_listing</span><span class="p">,</span> <span class="ss">only</span><span class="p">:</span> <span class="o">[</span><span class="ss">:show</span><span class="p">,</span> <span class="ss">:update</span><span class="p">,</span> <span class="ss">:destroy</span><span class="o">]</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">index</span>
-</span><span class='line'>    <span class="k">if</span> <span class="n">listing_type</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:listing_type</span><span class="o">]</span>
-</span><span class='line'>      <span class="vi">@listings</span> <span class="o">=</span> <span class="no">Listing</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">listing_type</span><span class="p">:</span> <span class="n">listing_type</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">elsif</span> <span class="n">price</span> <span class="o">=</span> <span class="n">params</span><span class="o">[</span><span class="ss">:price</span><span class="o">]</span>
-</span><span class='line'>      <span class="vi">@listings</span> <span class="o">=</span> <span class="no">Listing</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="ss">price</span><span class="p">:</span> <span class="n">price</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">else</span>
-</span><span class='line'>      <span class="vi">@listings</span> <span class="o">=</span> <span class="no">Listing</span><span class="o">.</span><span class="n">all</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>    <span class="n">respond_to</span> <span class="k">do</span> <span class="o">|</span><span class="nb">format</span><span class="o">|</span>
-</span><span class='line'>      <span class="nb">format</span><span class="o">.</span><span class="n">json</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">create</span>
-</span><span class='line'>    <span class="vi">@listing</span> <span class="o">=</span> <span class="no">Listing</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">listing_params</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">if</span> <span class="vi">@listing</span><span class="o">.</span><span class="n">save</span>
-</span><span class='line'>      <span class="n">render</span> <span class="ss">json</span><span class="p">:</span> <span class="vi">@listing</span><span class="p">,</span> <span class="ss">status</span><span class="p">:</span> <span class="mi">201</span><span class="p">,</span> <span class="ss">location</span><span class="p">:</span> <span class="vi">@listing</span>
-</span><span class='line'>    <span class="k">else</span>
-</span><span class='line'>      <span class="n">render</span> <span class="ss">json</span><span class="p">:</span> <span class="vi">@listing</span><span class="o">.</span><span class="n">errors</span><span class="p">,</span> <span class="ss">status</span><span class="p">:</span> <span class="mi">422</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span><span class="o">.</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">destroy</span>
-</span><span class='line'>    <span class="vi">@listing</span><span class="o">.</span><span class="n">destroy</span>
-</span><span class='line'>    <span class="n">head</span> <span class="mi">204</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kp">private</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">set_listing</span>
-</span><span class='line'>    <span class="vi">@listing</span> <span class="o">=</span> <span class="no">Listing</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">params</span><span class="o">[</span><span class="ss">:id</span><span class="o">]</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">listing_params</span>
-</span><span class='line'>    <span class="n">params</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="ss">:listing</span><span class="p">)</span><span class="o">.</span><span class="n">permit</span><span class="p">(</span><span class="ss">:address</span><span class="p">,</span> <span class="ss">:listing_type</span><span class="p">,</span> <span class="ss">:title</span><span class="p">,</span> <span class="ss">:description</span><span class="p">,</span> <span class="ss">:price</span><span class="p">,</span> <span class="ss">:neighborhood_id</span><span class="p">,</span> <span class="ss">:host_id</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This controller ultimately inherits from <code>ActionController::Base</code>, and I&rsquo;m using jbuilder to format the rendered JSON. Pretty straightforward.</p>
-
-<p>The first thing we need to do is tell each test to <code>render_views</code>. As we&rsquo;re rendering JSON via jbuilder, and these are handled by Rails as views. This should go at the top before any tests.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">ListingsController</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:controller</span> <span class="k">do</span>
 </span><span class='line'>  <span class="n">render_views</span>
-</span><span class='line'>  <span class="c1">#describe ...</span>
-</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">let</span><span class="p">(</span><span class="ss">:json</span><span class="p">)</span> <span class="p">{</span> <span class="n">json</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1"># describe...</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h2>GET</h2>
+<h3>GET</h3>
 
-<p>The <code>GET /listings</code> request should return all of the listings, with or without a filter. A simple test for this needs to:</p>
+<p>The GET /listings request should return all of the listings, with or without a filter. A simple test for this needs to:</p>
 
 <ul>
-<li>make a GET request to the <code>index</code> method and specify the format we&rsquo;re responding with (json)</li>
-<li>parse the response body into a JSON object so we can see what we&rsquo;re getting back from the request</li>
-<li><code>body</code> looks like this:</li>
+<li>make a GET request to the index method and specify the format we’re responding with (json)</li>
+<li>parse the response body into a JSON object so we can see what we’re getting back from the request (which I&rsquo;ve done once, above, in a <code>let</code> block, because this is a repeated action)</li>
+<li>body looks like this:</li>
 </ul>
 
 
@@ -208,8 +127,7 @@
 
 <ul>
 <li>grab some of that JSON data to assert an expectation on</li>
-<li>test that the response status is 200</li>
-<li>test that the data is what we expect it to be (against some data in our test database, in this case I just built this in a <code>before(:each)</code> block)</li>
+<li>test that the data is what we expect it to be (against some data in our test database, in this case I just built this in a <code>before(:each)</code> block in my <code>rails_helper</code>)</li>
 </ul>
 
 
@@ -222,17 +140,23 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">it</span> <span class="s1">&#39;returns all the listings&#39;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">get</span> <span class="ss">:index</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="ss">:json</span>
-</span><span class='line'>  <span class="n">body</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">listing_titles</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">collect</span> <span class="p">{</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span> <span class="n">l</span><span class="o">[</span><span class="s2">&quot;title&quot;</span><span class="o">]</span> <span class="p">}</span>
-</span><span class='line'>  <span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">expect</span><span class="p">(</span><span class="n">listing_titles</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="kp">include</span><span class="p">(</span><span class="vi">@listing1</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">describe</span> <span class="s2">&quot;GET /listings.json&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">before</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">get</span> <span class="ss">:index</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="ss">:json</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">context</span> <span class="s1">&#39;all listings&#39;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">it</span> <span class="s1">&#39;returns the listings&#39;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">expect</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">collect</span><span class="p">{</span><span class="o">|</span><span class="n">l</span><span class="o">|</span> <span class="n">l</span><span class="o">[</span><span class="s2">&quot;title&quot;</span><span class="o">]</span><span class="p">})</span><span class="o">.</span><span class="n">to</span> <span class="kp">include</span><span class="p">(</span><span class="vi">@listing1</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Next let&rsquo;s test that we can return all the listings of a certain price, price being a parameter. Remember above in our <code>index</code> method we wrote a conditional to check for a <code>params[:price]</code>, and if that was given, return all listings <code>where</code> &ldquo;price&rdquo; is that price. Our test for this will look very much like the above test, except we&rsquo;re accounting for price, which is passed into a <code>get :index</code> method along with format.</p>
+<p>Next let’s test that we can return all the listings of a certain price, price being a parameter. In my <a href="https://gist.github.com/ahimmelstoss/05618329e1d86aee383b">listings controller</a>, there&rsquo;s an <code>index</code> method with a conditional to check for a <code>params[:price]</code>, and if that was given, return all listings <code>where</code> “price” is that price. Our test for this will look very much like the above test, except we’re accounting for price, which is passed into a <code>get :index</code> method along with format.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -241,72 +165,111 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">it</span> <span class="s1">&#39;returns all listings given price filter&#39;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">get</span> <span class="ss">:index</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="ss">:json</span><span class="p">,</span> <span class="ss">price</span><span class="p">:</span> <span class="mi">50</span><span class="o">.</span><span class="mo">00</span>
-</span><span class='line'>  <span class="n">body</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">listing_titles</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">collect</span> <span class="p">{</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span> <span class="n">l</span><span class="o">[</span><span class="s2">&quot;title&quot;</span><span class="o">]</span> <span class="p">}</span>
-</span><span class='line'>  <span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">expect</span><span class="p">(</span><span class="n">listing_titles</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="kp">include</span><span class="p">(</span><span class="vi">@listing1</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>POST</h2>
-
-<p>Now let&rsquo;s work on testing our <code>POST /listings</code> request. We&rsquo;re going to test that it can work (returning a 201) and that it can fail (returning a 422).</p>
-
-<p>Our test will function much like our tests for our above get requests. Instead it will call the <code>post :create</code> method which specifies the format as well as the required params for <code>:listing</code>, which we specified in a private method <code>listing_params</code> in our controller.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">it</span> <span class="s1">&#39;creates a new listing&#39;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">post</span> <span class="ss">:create</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="ss">:json</span><span class="p">,</span> <span class="ss">:listing</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">address</span><span class="p">:</span> <span class="s2">&quot;4 Privet Drive&quot;</span><span class="p">,</span> <span class="n">listing_type</span><span class="p">:</span> <span class="s2">&quot;private room&quot;</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s2">&quot;Charming Little Spot in Little Whinging&quot;</span><span class="p">,</span> <span class="ss">description</span><span class="p">:</span> <span class="s2">&quot;Charming little room with a twin bed and exposed ceiling beams. Great overhead light and shelf to put your things.&quot;</span><span class="p">,</span> <span class="ss">price</span><span class="p">:</span> <span class="mi">50</span><span class="o">.</span><span class="mo">00</span><span class="p">,</span> <span class="n">neighborhood_id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">host_id</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
-</span><span class='line'>  <span class="n">body</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span><span class="p">(</span><span class="mi">201</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">expect</span><span class="p">(</span><span class="no">Listing</span><span class="o">.</span><span class="n">last</span><span class="o">.</span><span class="n">address</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span><span class="p">(</span><span class="s2">&quot;4 Privet Drive&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Let&rsquo;s also test that a failure will happen without the expected params (setting <code>neighborhood_id</code> to nil). There&rsquo;s a validation on the listing model where a listing must have an associated neighborhood, which I&rsquo;ve already tested in a model test. However, I wanted to test that the controller would return a 422 if the validation doesn&rsquo;t pass. Here we go:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">it</span> <span class="s1">&#39;fails to create a listing without a neighborhood&#39;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">post</span> <span class="ss">:create</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="ss">:json</span><span class="p">,</span> <span class="ss">:listing</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">address</span><span class="p">:</span> <span class="s2">&quot;4 Privet Drive&quot;</span><span class="p">,</span> <span class="n">listing_type</span><span class="p">:</span> <span class="s2">&quot;private room&quot;</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s2">&quot;Charming Little Spot in Little Whinging&quot;</span><span class="p">,</span> <span class="ss">description</span><span class="p">:</span> <span class="s2">&quot;Charming little room with a twin bed and exposed ceiling beams. Great overhead light and shelf to put your things.&quot;</span><span class="p">,</span> <span class="ss">price</span><span class="p">:</span> <span class="mi">50</span><span class="o">.</span><span class="mo">00</span><span class="p">,</span> <span class="n">neighborhood_id</span><span class="p">:</span> <span class="kp">nil</span><span class="p">,</span> <span class="n">host_id</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
-</span><span class='line'>  <span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span><span class="p">(</span><span class="mi">422</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>DELETE</h2>
-
-<p>Last, let&rsquo;s test deleting a listing. We want to call the <code>delete :destroy</code> method with the format and the id params specified (we&rsquo;re going to delete the first item in our test database). We want to test that the controller destroy method returns the expected response status as well deleting the record from the database.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">describe</span> <span class="s1">&#39;DELETE /listings/:id&#39;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">it</span> <span class="s1">&#39;deletes a listing&#39;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">delete</span> <span class="ss">:destroy</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="ss">:json</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="mi">1</span>
-</span><span class='line'>    <span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span><span class="p">(</span><span class="mi">204</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">expect</span><span class="p">(</span><span class="no">Listing</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">to</span> <span class="n">be_empty</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">context</span> <span class="s1">&#39;all listings given price filter&#39;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">before</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">get</span> <span class="ss">:index</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="ss">:json</span><span class="p">,</span> <span class="ss">price</span><span class="p">:</span> <span class="mi">50</span><span class="o">.</span><span class="mi">0</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">it</span> <span class="s1">&#39;returns the listings&#39;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">expect</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">collect</span><span class="p">{</span><span class="o">|</span><span class="n">l</span><span class="o">|</span> <span class="n">l</span><span class="o">[</span><span class="s2">&quot;title&quot;</span><span class="o">]</span><span class="p">})</span><span class="o">.</span><span class="n">to</span> <span class="kp">include</span><span class="p">(</span><span class="vi">@listing1</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
 </span><span class='line'>  <span class="k">end</span>
 </span><span class='line'><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>There we go! RSpec makes it easy to test Rails APIs by simulating HTTP requests via get, post, patch, and delete methods.</p>
+<h3>POST</h3>
+
+<p>Now let’s work on testing our <code>POST /listings.json</code> request. We’re going to test that it can work (creating a new listing object in our database) and that it can fail (returning a 422).</p>
+
+<p>Our success test will function much like our test for our above get requests. Instead it will call the <code>post :create</code> method which specifies the format as well as the required params for <code>:listing</code>, which we specified in a private method <code>listing_params</code> in our controller.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">describe</span> <span class="s1">&#39;POST /listings.json&#39;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">context</span> <span class="s1">&#39;new listing success&#39;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">before</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">post</span> <span class="ss">:create</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="ss">:json</span><span class="p">,</span> <span class="ss">:listing</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">address</span><span class="p">:</span> <span class="s2">&quot;123 Testing Lane&quot;</span><span class="p">,</span> <span class="n">listing_type</span><span class="p">:</span> <span class="s2">&quot;shared room&quot;</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s2">&quot;Testing Listing&quot;</span><span class="p">,</span> <span class="ss">description</span><span class="p">:</span> <span class="s2">&quot;idk&quot;</span><span class="p">,</span> <span class="ss">price</span><span class="p">:</span> <span class="mi">1000</span><span class="o">.</span><span class="mo">00</span><span class="p">,</span> <span class="n">neighborhood_id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">host_id</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">it</span> <span class="s1">&#39;creates a new listing&#39;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">expect</span><span class="p">(</span><span class="no">Listing</span><span class="o">.</span><span class="n">last</span><span class="o">.</span><span class="n">address</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span><span class="p">(</span><span class="s2">&quot;123 Testing Lane&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let’s also test that a failure will happen without the expected params (setting <code>neighborhood_id</code> to nil). There’s a validation on the listing model where a listing must have an associated neighborhood, which I’ve already tested in a model test. However, I wanted to test that the controller would return a 422 if the validation doesn’t pass. Here we go:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">context</span> <span class="s1">&#39;new listing failure&#39;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">before</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">post</span> <span class="ss">:create</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="ss">:json</span><span class="p">,</span> <span class="ss">:listing</span> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">address</span><span class="p">:</span> <span class="s2">&quot;123 Testing Lane&quot;</span><span class="p">,</span> <span class="n">listing_type</span><span class="p">:</span> <span class="s2">&quot;shared room&quot;</span><span class="p">,</span> <span class="ss">title</span><span class="p">:</span> <span class="s2">&quot;Testing Listing&quot;</span><span class="p">,</span> <span class="ss">description</span><span class="p">:</span> <span class="s2">&quot;idk&quot;</span><span class="p">,</span> <span class="ss">price</span><span class="p">:</span> <span class="mi">1000</span><span class="o">.</span><span class="mo">00</span><span class="p">,</span> <span class="n">neighborhood_id</span><span class="p">:</span> <span class="kp">nil</span><span class="p">,</span> <span class="n">host_id</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">it</span> <span class="s1">&#39;responds with 422&#39;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">expect</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">to</span> <span class="n">eq</span><span class="p">(</span><span class="mi">422</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>DELETE</h3>
+
+<p>Last, let’s test deleting a listing. We want to call the <code>delete :destroy</code> method with the format and the id params specified (we’re going to delete the first item in our test database). We want to test that the controller <code>destroy</code> method deletes the record from the database.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">describe</span> <span class="s1">&#39;DELETE /listings/:id.json&#39;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">before</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">delete</span> <span class="ss">:destroy</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="ss">:json</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">context</span> <span class="s1">&#39;delete a listing&#39;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">it</span> <span class="s1">&#39;deletes a listing&#39;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">expect</span><span class="p">(</span><span class="no">Listing</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">to</span> <span class="n">be_empty</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There we go! RSpec makes it easy to test Rails APIs by simulating HTTP requests via get, post, patch, and delete methods. Below are some gists of the code in full discussed in this post.</p>
+
+<h2>Code</h2>
+
+<ul>
+<li><a href="https://gist.github.com/ahimmelstoss/05618329e1d86aee383b">listings_controller.rb</a></li>
+<li><a href="https://gist.github.com/ahimmelstoss/3ad4726cec98fbd4c3c1">index.json.jbuilder</a></li>
+<li><a href="https://gist.github.com/ahimmelstoss/00d5e1db0d435d11b726">listings_controller_spec.rb</a></li>
+</ul>
+
 
 		
 		
