@@ -4,7 +4,7 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2014-07-29T19:46:40-04:00</updated>
+  <updated>2014-07-29T20:19:44-04:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
@@ -38,7 +38,7 @@
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">RSpec</span><span class="o">.</span><span class="n">describe</span> <span class="no">ListingsController</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:controller</span> <span class="k">do</span>
 </span><span class='line'>  <span class="n">render_views</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="n">let</span><span class="p">(</span><span class="ss">:json</span><span class="p">)</span> <span class="p">{</span> <span class="n">json</span> <span class="o">=</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>  <span class="n">let</span><span class="p">(</span><span class="ss">:json</span><span class="p">)</span> <span class="p">{</span> <span class="no">JSON</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="c1"># describe...</span>
 </span></code></pre></td></tr></table></div></figure>
