@@ -4,13 +4,118 @@
   <title><![CDATA[amanda himmelstoss]]></title>
   <link href="http://ahimmelstoss.github.io/atom.xml" rel="self"/>
   <link href="http://ahimmelstoss.github.io/"/>
-  <updated>2014-07-29T20:19:44-04:00</updated>
+  <updated>2014-12-01T21:56:29-05:00</updated>
   <id>http://ahimmelstoss.github.io/</id>
   <author>
     <name><![CDATA[amanda himmelstoss]]></name>
     
   </author>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building a Single Page Web App for Mobile]]></title>
+    <link href="http://ahimmelstoss.github.io/blog/2014/11/25/building-a-single-page-web-app-for-mobile/"/>
+    <updated>2014-11-25T21:37:13-05:00</updated>
+    <id>http://ahimmelstoss.github.io/blog/2014/11/25/building-a-single-page-web-app-for-mobile</id>
+    <content type="html"><![CDATA[<p>I few weeks ago, I was faced with a dilemma. I really like playing the game <a href="http://en.wikipedia.org/wiki/Carcassonne_%28board_game%29">Carcassonne</a>, and I wanted to be able to bring the game with me when I traveled, but while the pieces &ndash; small cardboard squares &ndash; can easily fit into a small bag, the board used to tally players&#8217; scores is larger and awkward to travel with. So I decided to solve this problem by building an app to replace the board. The app needed to allow a selected number of users (who can choose their meeple color) to be able to increment their count by clicking the number representing that count.</p>
+
+<p>Most importantly, the app also needed to be mobile-friendly from the start, because it would mostly likely always be accessed from someone&rsquo;s telephone while traveling. The focus of this project was to make the app mobile-browser ready, without needing to build iOS and Android apps. I&rsquo;m going to walk through how I used JavaScript, HTML, CSS, responsive design principles, and Rack to make this simple app called <a href="https://carcassonne-counter.herokuapp.com/">Carcassonne Counter</a>. Ultimately this is an example of building something with tools at hand that is entirely mobile responsive and user-friendly.</p>
+
+<p>The first task was to get the basic logic and functionality in place for user interaction. Client-side JavaScript is obviously perfect for this. I decided to <a href="https://github.com/ahimmelstoss/js-carcassonne-counter/blob/master/public/js/carcassonne_counter.js">go to town on the it</a> as an exercise in writing good, clean JavaScript, but that&rsquo;s for another blog post. But to give a general background of what the app is doing:</p>
+
+<ul>
+<li>a user can select the number of players and their colors</li>
+<li><code>.onClick()</code> the user increments the score count by one</li>
+<li>There are Player prototypes that:
+
+<ul>
+<li>keep track of player scores and color</li>
+<li>methods to reset the game</li>
+<li>decrement the score (if you make a mistake through overeager clicking)</li>
+<li>and a bunch of jQuery powered front-end methods</li>
+</ul>
+</li>
+</ul>
+
+
+<p>Let&rsquo;s dive in to some effective and easy ways to make a web app completely mobile friendly, with as close as possible functionality to any simple iOS or Android app that achieves the same thing.</p>
+
+<h2>The Layout</h2>
+
+<p>The app is a single page / single user experience design. The main focus of the page is each players&#8217; block, which holds their score number with the background-color of whichever color they selected. The templates for each number of players is hard-coded into the <code>index.html</code> page, because I think it makes more sense than dynamically rendering it, given how there are only 5 different templates.</p>
+
+<p>Here&rsquo;s what the app looks like for a two player game with blue and red meeples:</p>
+
+<p><img src="http://ahimmelstoss.github.io/images/carcassonne-counter.png" title="carcassonne-counter" ></p>
+
+<p>The entire page, no matter how many players were in the game (2-6), needed to be entirely fit for a mobile screen. For this I set the height and width to view width (<code>vw</code>) and view height (<code>vh</code>). CSS selectors, from <code>body</code> to each container for a players&#8217; block, use vw and vh instead of pecentages or pixels. This means that no matter the size of the screen (an iPhone 6 vs a Nexus 7 vs a Moto X) the color block, given the HTML template, will fit the view&rsquo;s width and height. This fixes the size of that HTML element to whatever &ldquo;percentage&rdquo; is selected. So for the above two player template, the CSS looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nf">#container2</span> <span class="nc">.player</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">100</span><span class="n">vw</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">50</span><span class="n">vh</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">line-height</span><span class="o">:</span> <span class="m">50</span><span class="n">vh</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This remains entirely responsive to whatever size screen / device the app is viewed on.</p>
+
+<h2>Clicking / Tapping Functionality</h2>
+
+<p>The main functionality of this app is clicking, or in the case of mobile use, tapping. One problem I encountered with the tapping functionality was that most mobile devices initialize double-tapping zoom as soon as tapping reaches a certain speed. On this single page, given that the view&rsquo;s width and height is always fixed to the size of the screen, zooming isn&rsquo;t necessary. I needed a way to disable that double-tap feature to allow for rapid tallying.</p>
+
+<p>First step is including in the <code>&lt;head&gt;</code> a <code>meta</code> property that disables the user&rsquo;s ability to change the view of the screen. This prevents the double-tapping zoom:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content=</span><span class="s">&quot;user-scalable=no&quot;</span> <span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next, in order to utilize that double-tap functionality for rapid tapping, I used a super simple and easy JavaScript plugin called <a href="https://github.com/ngryman/jquery.finger">jQuery Finger</a>.</p>
+
+<p>In addition to setting an event handler on tap&hellip;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.player&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">number</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;tap&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">incrementNumber</span><span class="p">();</span> <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>&hellip;you can also set one on double tap, using jQuery Finger&rsquo;s custom event handler:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.player&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">number</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;doubletap&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">incrementNumber</span><span class="p">();</span> <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Focused Swiping Functionality</h3>
+
+<p>What if a player accidentally increments their tally, and they need to subtract some points? Swiping backwards on the number area where you&rsquo;re tapping to increment is a logical gesture. jQuery Finger has an event handler for that as well:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.player&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">number</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;flick&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">decrementNumber</span><span class="p">();</span> <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Rack</h2>
+
+<p>Finally, I turned the single page application into a Rack app. This was entirely out of laziness, because I wanted to be able to host it easily, and Heroku is great for that. There are pluses and minuses to static Rack websites, and I won&rsquo;t go too much into that only to say I think it&rsquo;s fine for small, single page, side projects like this. I mostly followed <a href="https://devcenter.heroku.com/articles/static-sites-ruby">this helpful guide</a> on Heroku on how to set up a <code>config.ru</code> file.</p>
+
+<h2>Conclusion</h2>
+
+<p>Eventually I would love for Carcassonne Counter to be turned into something that&rsquo;s in the App Store / Google Play Store, but ultimately this solution makes the most sense given the simple problem and the usage. The app is completely responsive for any sized screen, which makes it pretty versatile for users, and has many of the same mobile gesture capabilites as an iOS/Android app. Ultimately I&rsquo;ll be building a Rails backend to persist game data and support other game counting/scoring as well, and at that point, this app will most likely be expanded on substantially, and perhaps I&rsquo;ll even delve into making at iOS/Android then.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Testing Rails jBuilder JSON APIs with RSpec]]></title>
@@ -2413,23 +2518,6 @@ For example, to find the index of an element in an array, in JavaScript you writ
 <code>launchctl start com.myname.myprogram</code></p>
 
 <p>Waiting in my inbox moments later was my newsletter. :)</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[On Breaking Things]]></title>
-    <link href="http://ahimmelstoss.github.io/blog/2013/10/10/on-breaking-things/"/>
-    <updated>2013-10-10T18:26:00-04:00</updated>
-    <id>http://ahimmelstoss.github.io/blog/2013/10/10/on-breaking-things</id>
-    <content type="html"><![CDATA[<p>Before starting the Flatiron prework I had never been inside my terminal window before. I knew what it was, but I never ventured in, mostly out of fear of breaking something. I knew terminal was serious techie territory; navigating around on the computer without it was just using an interface, and those who knew the terminal were just computer geniuses. I however, wasn&rsquo;t that. I have always been good with computers, comfortable and capable of general problem solving. I mean, I even knew what terminal was; not many I know do.</p>
-
-<p>While doing the prework and going over command line basics, my mind was in many ways blown. A simple <code>-ls</code> while in a directory I knew very well from the GUI side of things suddenly had a whole new display. Navigating through directories, making (and deleting, but very carefully) files from the command line offered me a sense of control over my machine* and an understanding of what it all looked like, really.</p>
-
-<p>One thing I have been grappling with through the prework and in the first days of school is the fear of breaking things. Through the command line, I&rsquo;m in a different world than what I&rsquo;ve always been familiar with. And this world feels more serious. Before, I could move a file through dragging it, and I wouldn&rsquo;t lose it or get confused, because I myself physically put it there. From the command line, things could get confusing  if I&rsquo;m not careful or paying attention. Before I could delete a file of folder and it would go safely into the trash bin. Now, a simple <code>rm -f</code> or <code>rm rf</code> deletes it forever. That&rsquo;s serious.</p>
-
-<p>Even with code, I&rsquo;ve paused before running it not out of anticipation of what it might do, but with what might break, even if it&rsquo;s just testing. I&rsquo;m used to living in a world where I can&rsquo;t really break my computer, because I&rsquo;m just on the surface. The command line changes this. One of the most important things with programming is being comfortable with breaking things, and I&rsquo;m trying every day to have more courage in doing that.</p>
-
-<p>*Once you start referring to your pretty MBP Retina as a machine I think means you&rsquo;ve crossed over to the nerd side of things :)</p>
 ]]></content>
   </entry>
   

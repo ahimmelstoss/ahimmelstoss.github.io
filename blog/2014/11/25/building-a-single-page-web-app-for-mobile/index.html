@@ -1,0 +1,236 @@
+
+<!DOCTYPE HTML>
+<html lang="en-GB">
+<head>
+	<meta charset="utf-8">
+	<title>Building a Single Page Web App for Mobile  | amanda himmelstoss</title>
+
+	<meta name="author" content="amanda himmelstoss">
+
+<meta name="description" content="I few weeks ago, I was faced with a dilemma. I really like playing the game Carcassonne, and I wanted to be able to bring the game with me when I &hellip;"> <meta name="keywords" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="amanda himmelstoss" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">amanda himmelstoss</a></h1>
+<span class="tagline">building things</span>
+<nav id="main-nav"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</div>
+	</div>
+</nav>
+
+
+</header>
+
+	<div id="content" class="inner"><article class="post">
+	<header>
+		<h2 class="title">Building a Single Page Web App for Mobile</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-11-25T21:37:13-05:00" pubdate data-updated="true">Nov 25<span>th</span>, 2014</time></div>
+	</header>
+	<div class="entry-content"><p>I few weeks ago, I was faced with a dilemma. I really like playing the game <a href="http://en.wikipedia.org/wiki/Carcassonne_%28board_game%29">Carcassonne</a>, and I wanted to be able to bring the game with me when I traveled, but while the pieces &ndash; small cardboard squares &ndash; can easily fit into a small bag, the board used to tally players&#8217; scores is larger and awkward to travel with. So I decided to solve this problem by building an app to replace the board. The app needed to allow a selected number of users (who can choose their meeple color) to be able to increment their count by clicking the number representing that count.</p>
+
+<p>Most importantly, the app also needed to be mobile-friendly from the start, because it would mostly likely always be accessed from someone&rsquo;s telephone while traveling. The focus of this project was to make the app mobile-browser ready, without needing to build iOS and Android apps. I&rsquo;m going to walk through how I used JavaScript, HTML, CSS, responsive design principles, and Rack to make this simple app called <a href="https://carcassonne-counter.herokuapp.com/">Carcassonne Counter</a>. Ultimately this is an example of building something with tools at hand that is entirely mobile responsive and user-friendly.</p>
+
+<p>The first task was to get the basic logic and functionality in place for user interaction. Client-side JavaScript is obviously perfect for this. I decided to <a href="https://github.com/ahimmelstoss/js-carcassonne-counter/blob/master/public/js/carcassonne_counter.js">go to town on the it</a> as an exercise in writing good, clean JavaScript, but that&rsquo;s for another blog post. But to give a general background of what the app is doing:</p>
+
+<ul>
+<li>a user can select the number of players and their colors</li>
+<li><code>.onClick()</code> the user increments the score count by one</li>
+<li>There are Player prototypes that:
+
+<ul>
+<li>keep track of player scores and color</li>
+<li>methods to reset the game</li>
+<li>decrement the score (if you make a mistake through overeager clicking)</li>
+<li>and a bunch of jQuery powered front-end methods</li>
+</ul>
+</li>
+</ul>
+
+
+<p>Let&rsquo;s dive in to some effective and easy ways to make a web app completely mobile friendly, with as close as possible functionality to any simple iOS or Android app that achieves the same thing.</p>
+
+<h2>The Layout</h2>
+
+<p>The app is a single page / single user experience design. The main focus of the page is each players&#8217; block, which holds their score number with the background-color of whichever color they selected. The templates for each number of players is hard-coded into the <code>index.html</code> page, because I think it makes more sense than dynamically rendering it, given how there are only 5 different templates.</p>
+
+<p>Here&rsquo;s what the app looks like for a two player game with blue and red meeples:</p>
+
+<p><img src="/images/carcassonne-counter.png" title="carcassonne-counter" ></p>
+
+<p>The entire page, no matter how many players were in the game (2-6), needed to be entirely fit for a mobile screen. For this I set the height and width to view width (<code>vw</code>) and view height (<code>vh</code>). CSS selectors, from <code>body</code> to each container for a players&#8217; block, use vw and vh instead of pecentages or pixels. This means that no matter the size of the screen (an iPhone 6 vs a Nexus 7 vs a Moto X) the color block, given the HTML template, will fit the view&rsquo;s width and height. This fixes the size of that HTML element to whatever &ldquo;percentage&rdquo; is selected. So for the above two player template, the CSS looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nf">#container2</span> <span class="nc">.player</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">100</span><span class="n">vw</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">50</span><span class="n">vh</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">line-height</span><span class="o">:</span> <span class="m">50</span><span class="n">vh</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This remains entirely responsive to whatever size screen / device the app is viewed on.</p>
+
+<h2>Clicking / Tapping Functionality</h2>
+
+<p>The main functionality of this app is clicking, or in the case of mobile use, tapping. One problem I encountered with the tapping functionality was that most mobile devices initialize double-tapping zoom as soon as tapping reaches a certain speed. On this single page, given that the view&rsquo;s width and height is always fixed to the size of the screen, zooming isn&rsquo;t necessary. I needed a way to disable that double-tap feature to allow for rapid tallying.</p>
+
+<p>First step is including in the <code>&lt;head&gt;</code> a <code>meta</code> property that disables the user&rsquo;s ability to change the view of the screen. This prevents the double-tapping zoom:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content=</span><span class="s">&quot;user-scalable=no&quot;</span> <span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next, in order to utilize that double-tap functionality for rapid tapping, I used a super simple and easy JavaScript plugin called <a href="https://github.com/ngryman/jquery.finger">jQuery Finger</a>.</p>
+
+<p>In addition to setting an event handler on tap&hellip;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.player&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">number</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;tap&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">incrementNumber</span><span class="p">();</span> <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>&hellip;you can also set one on double tap, using jQuery Finger&rsquo;s custom event handler:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.player&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">number</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;doubletap&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">incrementNumber</span><span class="p">();</span> <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Focused Swiping Functionality</h3>
+
+<p>What if a player accidentally increments their tally, and they need to subtract some points? Swiping backwards on the number area where you&rsquo;re tapping to increment is a logical gesture. jQuery Finger has an event handler for that as well:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;.player&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">number</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;flick&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">decrementNumber</span><span class="p">();</span> <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Rack</h2>
+
+<p>Finally, I turned the single page application into a Rack app. This was entirely out of laziness, because I wanted to be able to host it easily, and Heroku is great for that. There are pluses and minuses to static Rack websites, and I won&rsquo;t go too much into that only to say I think it&rsquo;s fine for small, single page, side projects like this. I mostly followed <a href="https://devcenter.heroku.com/articles/static-sites-ruby">this helpful guide</a> on Heroku on how to set up a <code>config.ru</code> file.</p>
+
+<h2>Conclusion</h2>
+
+<p>Eventually I would love for Carcassonne Counter to be turned into something that&rsquo;s in the App Store / Google Play Store, but ultimately this solution makes the most sense given the simple problem and the usage. The app is completely responsive for any sized screen, which makes it pretty versatile for users, and has many of the same mobile gesture capabilites as an iOS/Android app. Ultimately I&rsquo;ll be building a Rails backend to persist game data and support other game counting/scoring as well, and at that point, this app will most likely be expanded on substantially, and perhaps I&rsquo;ll even delve into making at iOS/Android then.</p>
+</div>
+	
+		<div class="meta">
+			<span class="comments"><a href="/blog/2014/11/25/building-a-single-page-web-app-for-mobile/#disqus_thread">Comments</a></span>
+		</div>
+	
+
+</article>
+
+	
+	<div class="share">
+		<ul>
+			<li>
+  <a href="https://twitter.com/intent/tweet?text=Building a Single Page Web App for Mobile by @ahimmelstoss&url=http://ahimmelstoss.github.io/blog/2014/11/25/building-a-single-page-web-app-for-mobile/" title="Share Building a Single Page Web App for Mobile on Twitter">
+    <img src="/images/social/twitter.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://www.facebook.com/sharer.php?u=http://ahimmelstoss.github.io/blog/2014/11/25/building-a-single-page-web-app-for-mobile/" title="Share Building a Single Page Web App for Mobile on Facebook">
+    <img src="/images/social/facebook.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://plus.google.com/share?url=http://ahimmelstoss.github.io/blog/2014/11/25/building-a-single-page-web-app-for-mobile/" title="Share Building a Single Page Web App for Mobile on Google Plus">
+    <img src="/images/social/google.png" />
+  </a>
+</li>
+
+		</ul>
+	</div>
+
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">&copy; 2014
+
+    amanda himmelstoss
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/hyphenator.js"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'ahimmelstoss';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ahimmelstoss.github.io/blog/2014/11/25/building-a-single-page-web-app-for-mobile/';
+        var disqus_url = 'http://ahimmelstoss.github.io/blog/2014/11/25/building-a-single-page-web-app-for-mobile/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+</body>
+</html>
