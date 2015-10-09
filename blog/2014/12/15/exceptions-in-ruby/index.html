@@ -1,0 +1,235 @@
+
+<!DOCTYPE HTML>
+<html lang="en-GB">
+<head>
+	<meta charset="utf-8">
+	<title>Exceptions in Ruby  | amanda himmelstoss</title>
+
+	<meta name="author" content="amanda himmelstoss">
+
+<meta name="description" content="Why do we do exception handling? Sometimes things don&rsquo;t execute the way they are designed to, for reasons outside of our code&rsquo;s &hellip;"> <meta name="keywords" content="">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="amanda himmelstoss" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">amanda himmelstoss</a></h1>
+<span class="tagline">building things</span>
+<nav id="main-nav"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul>
+	<li><a href="/about">About</a></li>
+	<li><a href="/archives">Archives</a></li>
+<!-- 	<li><a href="/contact">Contact</a></li> -->
+</ul>
+</div>
+	</div>
+</nav>
+
+
+</header>
+
+	<div id="content" class="inner"><article class="post">
+	<header>
+		<h2 class="title">Exceptions in Ruby</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-12-15T20:21:51-05:00" pubdate data-updated="true">Dec 15<span>th</span>, 2014</time></div>
+	</header>
+	<div class="entry-content"><p>Why do we do exception handling? Sometimes things don&rsquo;t execute the way they are designed to, for reasons outside of our code&rsquo;s responsibilty. Maybe your code relies on something external, for example, scraping, an external server, an API. If your code uses external input, exceptions are a way of handling any <i>exceptions</i> to the expected outcome.</p>
+
+<p>In many ways, exceptions are similar to conditionals. The exception handling block in Ruby, the <code>begin...rescue</code> block, is not unlike an <code>if...else</code> conditional statement; they both control flow. Exceptions account for the possibility of something happening and accounting for that, not unlike conditional statements.</p>
+
+<p>Let&rsquo;s look at a simple example method in Ruby:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">plus_one</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When we run <code>plus_one("22")</code>, as you can guess, we&rsquo;re going to get the following error returned:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># =&gt; TypeError: String can&#39;t be coerced into Fixnum</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we wanted to avoid that <code>TypeError</code> from happening, which would break our program at runtime, we could write a conditional that expects input that&rsquo;s not a number and sanitizes it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">plus_one</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">!</span><span class="n">num</span><span class="o">.</span><span class="n">is_a?</span><span class="p">(</span><span class="no">Fixnum</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">num</span><span class="o">.</span><span class="n">to_f</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>    <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But what if you wanted to know about that error, not just go ahead and fix it? Or maybe you really cannot fix the input yourself, because it&rsquo;s coming from somewhere else. Or, most commonly, you just need to handle the error and keep things running.</p>
+
+<p>That&rsquo;s where exception handling comes in:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">plus_one</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">begin</span>
+</span><span class='line'>    <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="k">rescue</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;Can&#39;t add a </span><span class="si">#{</span><span class="n">num</span><span class="o">.</span><span class="n">class</span><span class="si">}</span><span class="s2"> &#39;</span><span class="si">#{</span><span class="n">num</span><span class="si">}</span><span class="s2">&#39; to an integer. Please make sure the input is an integer.&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>begin...rescue</code> block works as such that when <code>begin</code> is triggered, it&rsquo;s going to <i>try</i> to execute whatever code is in that block, and, if for whatever reason it can&rsquo;t (for example, a <code>TypeError</code>), it&rsquo;s going to fall down to the <code>rescue</code> block and execute the code in that block instead. This way, our program won&rsquo;t crash if there&rsquo;s an error.</p>
+
+<p>Our contrived example doesn&rsquo;t really lend itself to anything other than what it is, but the fact that exception handling prevents our program from crashing is very important. If our code relies on data that is external, we don&rsquo;t have full control over it. It can change. That&rsquo;s the power of exception handling: our program will not break if what it relies on changes.</p>
+
+<p>So our <code>begin...rescue</code> block is pretty cool, but we can take exception handling even further if we need to.</p>
+
+<p>In our above <code>begin...rescue</code> block, <code>num += 1</code> will only be called if an error isn&rsquo;t raised during its execution. What if, regardless of that code being run, we want something else to always execute? That&rsquo;s where the <code>ensure</code> block comes in.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">plus_one</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">begin</span>
+</span><span class='line'>    <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="k">rescue</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;Can&#39;t add a </span><span class="si">#{</span><span class="n">num</span><span class="o">.</span><span class="n">class</span><span class="si">}</span><span class="s2"> &#39;</span><span class="si">#{</span><span class="n">num</span><span class="si">}</span><span class="s2">&#39; to an integer. Please make sure the input is an integer.&quot;</span>
+</span><span class='line'>  <span class="k">ensure</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;You&#39;ll always see me!&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://ruby-doc.org/docs/keywords/1.9/Object.html#method-i-ensure">Ensure</a> happens after both the <code>begin</code> and <code>rescue</code> blocks are ran, and will always execute, hence the name ensure.</p>
+
+<p>Exceptions like <code>begin...rescue</code> are great for just that, throwing exception messages. While they act like conditional expressions, they really should never be used for managing conditional flow. They should be reserved for providing information when something went wrong, handling what happens when that error occurs, and keep things flowing. The reasoning for this isn&rsquo;t a stylistic choice: figuring out where and why something went wrong takes time. Exception handling is slow, and conditional flow, part of everyday development, should be fast.</p>
+
+<p>Up next, I&rsquo;ll talk about another option for programmatic flow in Ruby: <code>try...catch</code>.</p>
+</div>
+	
+		<div class="meta">
+			<span class="comments"><a href="/blog/2014/12/15/exceptions-in-ruby/#disqus_thread">Comments</a></span>
+		</div>
+	
+
+</article>
+
+	
+	<div class="share">
+		<ul>
+			<li>
+  <a href="https://twitter.com/intent/tweet?text=Exceptions in Ruby by @ahimmelstoss&url=http://ahimmelstoss.github.io/blog/2014/12/15/exceptions-in-ruby/" title="Share Exceptions in Ruby on Twitter">
+    <img src="/images/social/twitter.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://www.facebook.com/sharer.php?u=http://ahimmelstoss.github.io/blog/2014/12/15/exceptions-in-ruby/" title="Share Exceptions in Ruby on Facebook">
+    <img src="/images/social/facebook.png" />
+  </a>
+</li>
+
+			<li>
+  <a href="https://plus.google.com/share?url=http://ahimmelstoss.github.io/blog/2014/12/15/exceptions-in-ruby/" title="Share Exceptions in Ruby on Google Plus">
+    <img src="/images/social/google.png" />
+  </a>
+</li>
+
+		</ul>
+	</div>
+
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">&copy; 2015
+
+    amanda himmelstoss
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/hyphenator.js"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'ahimmelstoss';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ahimmelstoss.github.io/blog/2014/12/15/exceptions-in-ruby/';
+        var disqus_url = 'http://ahimmelstoss.github.io/blog/2014/12/15/exceptions-in-ruby/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+</body>
+</html>

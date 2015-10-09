@@ -7,7 +7,7 @@
 
 	<meta name="author" content="amanda himmelstoss">
 
-<meta name="description" content="I few weeks ago, I was faced with a dilemma. I really like playing the game Carcassonne, and I wanted to be able to bring the game with me when I &hellip;"> <meta name="keywords" content="">
+<meta name="description" content="Why do we do exception handling? Sometimes things don&rsquo;t execute the way they are designed to, for reasons outside of our code&rsquo;s &hellip;"> <meta name="keywords" content="">
 
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -47,6 +47,133 @@
 </header>
 
 	<div id="content" class="inner">
+
+
+    <article class="post">
+	<header>
+		<h2 class="title">
+			
+			<a href="/blog/2014/12/15/exceptions-in-ruby/">
+			
+				Exceptions in Ruby</a>
+		</h2>
+		<div class="meta date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-12-15T20:21:51-05:00" pubdate data-updated="true">Dec 15<span>th</span>, 2014</time></div>
+	</header>
+	<div class="entry-content">
+		<p>Why do we do exception handling? Sometimes things don&rsquo;t execute the way they are designed to, for reasons outside of our code&rsquo;s responsibilty. Maybe your code relies on something external, for example, scraping, an external server, an API. If your code uses external input, exceptions are a way of handling any <i>exceptions</i> to the expected outcome.</p>
+
+<p>In many ways, exceptions are similar to conditionals. The exception handling block in Ruby, the <code>begin...rescue</code> block, is not unlike an <code>if...else</code> conditional statement; they both control flow. Exceptions account for the possibility of something happening and accounting for that, not unlike conditional statements.</p>
+
+<p>Let&rsquo;s look at a simple example method in Ruby:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">plus_one</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When we run <code>plus_one("22")</code>, as you can guess, we&rsquo;re going to get the following error returned:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># =&gt; TypeError: String can&#39;t be coerced into Fixnum</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we wanted to avoid that <code>TypeError</code> from happening, which would break our program at runtime, we could write a conditional that expects input that&rsquo;s not a number and sanitizes it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">plus_one</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">!</span><span class="n">num</span><span class="o">.</span><span class="n">is_a?</span><span class="p">(</span><span class="no">Fixnum</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">num</span><span class="o">.</span><span class="n">to_f</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>    <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But what if you wanted to know about that error, not just go ahead and fix it? Or maybe you really cannot fix the input yourself, because it&rsquo;s coming from somewhere else. Or, most commonly, you just need to handle the error and keep things running.</p>
+
+<p>That&rsquo;s where exception handling comes in:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">plus_one</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">begin</span>
+</span><span class='line'>    <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="k">rescue</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;Can&#39;t add a </span><span class="si">#{</span><span class="n">num</span><span class="o">.</span><span class="n">class</span><span class="si">}</span><span class="s2"> &#39;</span><span class="si">#{</span><span class="n">num</span><span class="si">}</span><span class="s2">&#39; to an integer. Please make sure the input is an integer.&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>begin...rescue</code> block works as such that when <code>begin</code> is triggered, it&rsquo;s going to <i>try</i> to execute whatever code is in that block, and, if for whatever reason it can&rsquo;t (for example, a <code>TypeError</code>), it&rsquo;s going to fall down to the <code>rescue</code> block and execute the code in that block instead. This way, our program won&rsquo;t crash if there&rsquo;s an error.</p>
+
+<p>Our contrived example doesn&rsquo;t really lend itself to anything other than what it is, but the fact that exception handling prevents our program from crashing is very important. If our code relies on data that is external, we don&rsquo;t have full control over it. It can change. That&rsquo;s the power of exception handling: our program will not break if what it relies on changes.</p>
+
+<p>So our <code>begin...rescue</code> block is pretty cool, but we can take exception handling even further if we need to.</p>
+
+<p>In our above <code>begin...rescue</code> block, <code>num += 1</code> will only be called if an error isn&rsquo;t raised during its execution. What if, regardless of that code being run, we want something else to always execute? That&rsquo;s where the <code>ensure</code> block comes in.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">plus_one</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">begin</span>
+</span><span class='line'>    <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="k">rescue</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;Can&#39;t add a </span><span class="si">#{</span><span class="n">num</span><span class="o">.</span><span class="n">class</span><span class="si">}</span><span class="s2"> &#39;</span><span class="si">#{</span><span class="n">num</span><span class="si">}</span><span class="s2">&#39; to an integer. Please make sure the input is an integer.&quot;</span>
+</span><span class='line'>  <span class="k">ensure</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;You&#39;ll always see me!&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://ruby-doc.org/docs/keywords/1.9/Object.html#method-i-ensure">Ensure</a> happens after both the <code>begin</code> and <code>rescue</code> blocks are ran, and will always execute, hence the name ensure.</p>
+
+<p>Exceptions like <code>begin...rescue</code> are great for just that, throwing exception messages. While they act like conditional expressions, they really should never be used for managing conditional flow. They should be reserved for providing information when something went wrong, handling what happens when that error occurs, and keep things flowing. The reasoning for this isn&rsquo;t a stylistic choice: figuring out where and why something went wrong takes time. Exception handling is slow, and conditional flow, part of everyday development, should be fast.</p>
+
+<p>Up next, I&rsquo;ll talk about another option for programmatic flow in Ruby: <code>try...catch</code>.</p>
+
+		
+		
+	</div>
+
+</article>
 
 
     <article class="post">
@@ -1433,66 +1560,6 @@
 </article>
 
 
-    <article class="post">
-	<header>
-		<h2 class="title">
-			
-			<a href="/blog/2013/12/31/the-splfixedarray-class/">
-			
-				The SplFixedArray Class</a>
-		</h2>
-		<div class="meta date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-12-31T18:56:00-05:00" pubdate data-updated="true">Dec 31<span>st</span>, 2013</time></div>
-	</header>
-	<div class="entry-content">
-		<p>Another type of data structure that is unique to PHP is the SplFixedArray. This is a class that embodies much of the same functionality as an indexed array, but performs slightly different.</p>
-
-<p>Arrays in PHP, while functionally similar to arrays in other languages, like Ruby, more closely resemble hashes, as both indexed and associative arrays both use key => value pairs, where the key can be either an integer or a string. However, SplFixedArrays are not unlike arrays found within Ruby. Their indexes are fixed integers, and their performance is better on a large scale than an associative array.</p>
-
-<p>An SplFixedArray has a fixed size (other arrays in PHP can be any size) that is determined in the  instantiation. Below, I&rsquo;ve instantiated a new SplFixedArray (remember, it&rsquo;s a class!) and set four of the values.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$cats</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SplFixedArray</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Maru&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Grumpy Cat&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Nala Cat&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$cats</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Chairman Meow&quot;</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>To increase the size of <code>$cats</code>:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$cats</span><span class="o">-&gt;</span><span class="na">setSize</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The value of <code>$cats[4];</code> will be NULL until it&rsquo;s set. (Note that <code>setSize();</code> is a class function.)</p>
-
-<p>The SplFixedArray is a great data structure that is more optimal in some cases, and for the Rubyists who love Ruby arrays, very familiar. :)</p>
-
-		
-		
-	</div>
-
-</article>
-
-
     <nav id="pagenavi">
         
         
@@ -1501,7 +1568,7 @@
     </nav>
 
 </div>
-	<footer id="footer" class="inner">&copy; 2014
+	<footer id="footer" class="inner">&copy; 2015
 
     amanda himmelstoss
 
